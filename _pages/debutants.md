@@ -6,7 +6,7 @@ image:
 image-alt: 
 ---
 {% assign lecons-sorted = site.lecons | sort: "title" %}
-{% for lecon in site.lecons-sorted %}
+{% for lecon in lecons-sorted %}
 {% if lecons.active != false and lecons.niveau == "debutant" %}
 
 <h3><a href="{{ lecon.url | relative_url }}">{{ lecon.title }}</a></h3>

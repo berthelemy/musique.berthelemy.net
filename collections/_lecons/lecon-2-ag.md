@@ -1,7 +1,7 @@
 ---
-title: Apprendre la trompette 1
+title: Apprendre la trompette 2
 auteur: Augustin Guefif
 niveau: debutant
-youtube: https://youtu.be/XUkP2hK9mRg?si=_hOjoIxmcR7FYMQ_
+youtube: https://youtu.be/ZGJKv4i1Q-w?si=aTjzcQRR56eVGPvR
 active: true
 ---
