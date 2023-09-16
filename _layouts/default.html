@@ -43,7 +43,7 @@
 											<h3>Autres accompagnements</h3>
 											<ul>
                                                 {% for accompagnement in site.accompagnements %}
-                                                <li><a href="{{ accompagnement.url | relative_url }}">{{ accompagnement.title }}</a> {{ accompagnement.key }}</li>
+                                                <li><a href="{{ accompagnement.url | relative_url }}">{{ accompagnement.title }}</a><br />{{ accompagnement.key }}</li>
                                                 {% endfor %}
                                             </ul>
 										</section>
