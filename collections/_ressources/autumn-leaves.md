@@ -5,4 +5,5 @@ key: Mi mineur (Em)
 type: backing-track
 difficulty: difficile
 youtube: https://youtu.be/KTs_cON_EI8?si=AEYf5hLdXECYPjSa
+active: false
 ---
