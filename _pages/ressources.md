@@ -1,7 +1,7 @@
 ---
 title: Ressources
 permalink: /ressources
-layout: default
+layout: no-sidebar
 image: 
 image-alt: 
 ---

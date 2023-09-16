@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<!--
+	Landed by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	{% include head.html %}
+	<body class="is-preload">
+		<div id="page-wrapper">
+
+			<!-- Header -->
+				<header id="header">
+					<h1 id="logo"><a href="index.html">Landed</a></h1>
+					{% include menu.html %}
+				</header>
+
+			<!-- Main -->
+				<div id="main" class="wrapper style1">
+					<div class="container">
+						{% include page-header.html %}
+
+						<!-- Content -->
+							<section id="content">
+								{{ content }}
+							</section>
+
+					</div>
+				</div>
+
+			{% include footer.html %}
+
+		</div>
+
+		{% include scripts.html %}
+
+	</body>
+</html>
