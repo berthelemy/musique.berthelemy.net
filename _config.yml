@@ -41,7 +41,7 @@ collections_dir: collections
 defaults:
   - scope:
       path: ""
-      type: "accompagnement"
+      type: "accompagnements"
     values:
       layout: "default"
       sidebar: "accompagnements"
