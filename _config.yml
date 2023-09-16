@@ -29,6 +29,8 @@ theme: minima
 plugins:
   - jekyll-feed
 
+include: ['_pages']
+
 collections:
   ressources:
     output: true
