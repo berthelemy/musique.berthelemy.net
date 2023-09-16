@@ -32,6 +32,7 @@ plugins:
 collections:
   resources:
     output: true
+    layout: default
 
 collections_dir: collections  
 
