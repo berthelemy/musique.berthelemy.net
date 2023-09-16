@@ -4,7 +4,6 @@ permalink: /ressources
 layout: default
 ---
 {% for ressource in site.ressources %}
-<h2>{{ ressource.title }}</h2>
-
-{{ ressource.content }}
+<h3><a href="{{ ressource.url }}">{{ ressource.title }}</a></h3>
+<p>{{ ressource.tagline }}</p>
 {% endfor %}

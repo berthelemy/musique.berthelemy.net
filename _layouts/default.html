@@ -32,9 +32,12 @@
                                         {% assign youtube-id = link-array[3] %}
                                         {% assign embed-link = "https://www.youtube.com/embed/" | append: youtube-id %}
                                         {% include youtube-embed.html link=embed-link %}
-                                        {% endif %}
-										<a href="#" class="image fit"><img src="images/pic06.jpg" alt="" /></a>
-										{{ content }}
+                                        
+										{% else %}
+                                        <a href="#" class="image fit"><img src="images/pic06.jpg" alt="" /></a>
+										{% endif %}
+                                        
+                                        {{ content }}
 									</section>
 
 							</div>
