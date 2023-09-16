@@ -32,7 +32,7 @@ plugins:
 include: ['_pages']
 
 collections:
-  ressources:
+  accompagnements:
     output: true
     permalink: /:collection/:name
 
@@ -41,10 +41,10 @@ collections_dir: collections
 defaults:
   - scope:
       path: ""
-      type: "ressources"
+      type: "accompagnement"
     values:
       layout: "default"
-      sidebar: "resources"
+      sidebar: "accompagnement"
   - scope:
       path: ""
       type: "posts"

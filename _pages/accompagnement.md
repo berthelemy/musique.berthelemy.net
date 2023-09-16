@@ -1,6 +1,6 @@
 ---
 title: Ressources
-permalink: /ressources
+permalink: /accompagnement
 layout: no-sidebar
 image: 
 image-alt: 

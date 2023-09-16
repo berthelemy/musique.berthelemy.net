@@ -38,12 +38,12 @@
 
 								<!-- Sidebar -->
 									<section id="sidebar">
-                                        {% if page.sidebar == "resources" %}
+                                        {% if page.sidebar == "accompagnement" %}
                                         <section>
-											<h3>Autres ressources</h3>
+											<h3>Autres accompagnements</h3>
 											<ul>
-                                                {% for ressource in site.ressources %}
-                                                <li><a href="{{ ressource.url | relative_url }}">{{ ressource.title }}</a> {{ ressource.key }}</li>
+                                                {% for accompagnement in site.accompagnements %}
+                                                <li><a href="{{ accompagnement.url | relative_url }}">{{ accompagnement.title }}</a> {{ accompagnement.key }}</li>
                                                 {% endfor %}
                                             </ul>
 										</section>
