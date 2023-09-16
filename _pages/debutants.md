@@ -5,9 +5,8 @@ layout: no-sidebar
 image: 
 image-alt: 
 ---
-{% assign lecons-sorted = site.lecons | sort: "auteur" %}
-{% assign events = item_types.event.published_items | nested_sort:"contents.starts_at" %}
-{% for lecon in site.lecons %}
+{% assign lecons-sorted = site.lecons | sort: "title" %}
+{% for lecon in site.lecons-sorted %}
 {% if lecons.active != false and lecons.niveau == "debutant" %}
 
 <h3><a href="{{ lecon.url | relative_url }}">{{ lecon.title }}</a></h3>
