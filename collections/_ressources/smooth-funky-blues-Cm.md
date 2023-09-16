@@ -1,5 +1,6 @@
 ---
 title: Smooth funky blues
+key: Do mineur (Cm)
 tagline: Jouer avec la piste d'accompagnement
 type: backing-track
 difficulty: moyen
