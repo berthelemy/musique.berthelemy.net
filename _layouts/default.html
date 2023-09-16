@@ -34,7 +34,7 @@
                                         {% include youtube-embed.html link=embed-link %}
                                         
 										{% else %}
-                                        <div class="image fit"><img src="images/pic06.jpg" alt="" /></div>
+                                        <div class="image fit"><img src="images/{{ page.image }}" alt="{{ page.image-alt }}" /></div>
 										{% endif %}
                                         
                                         {{ content }}
