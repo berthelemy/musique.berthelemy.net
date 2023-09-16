@@ -1,15 +1,15 @@
 ---
-title: Ressources
-permalink: /accompagnement
+title: Pistes d'accompagnement
+permalink: /accompagnements
 layout: no-sidebar
 image: 
 image-alt: 
 ---
-{% for ressource in site.ressources %}
-{% if ressource.active != false %}
-<h3><a href="{{ ressource.url | relative_url }}">{{ ressource.title }}</a></h3>
-<p>Tonalité: {{ ressource.key }}</p>
-<p>Type: {{ ressource.type }}</p>
-<p>Niveau: {{ ressource.difficulty }}</p>
+{% for accompagnement in site.accompagnements %}
+{% if accompagnement.active != false %}
+<h3><a href="{{ accompagnement.url | relative_url }}">{{ accompagnement.title }}</a></h3>
+<p>Tonalité: {{ accompagnement.key }}</p>
+<p>Type: {{ accompagnement.type }}</p>
+<p>Niveau: {{ accompagnement.difficulty }}</p>
 {% endif %}
 {% endfor %}
