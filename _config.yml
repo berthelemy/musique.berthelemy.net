@@ -35,6 +35,9 @@ collections:
   accompagnements:
     output: true
     permalink: /:collection/:name
+  lecons:
+    output: true
+    permalink: /:collection/:name
 
 collections_dir: collections
 
@@ -45,6 +48,12 @@ defaults:
     values:
       layout: "default"
       sidebar: "accompagnements"
+  - scope:
+      path: ""
+      type: "lecons"
+    values:
+      layout: "default"
+      sidebar: "lecons"
   - scope:
       path: ""
       type: "posts"
