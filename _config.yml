@@ -30,7 +30,7 @@ plugins:
   - jekyll-feed
 
 collections:
-  resources:
+  ressources:
     output: true
     layout: default
     permalink: /:collection/:name
