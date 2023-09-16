@@ -10,6 +10,6 @@ image-alt:
 {% if lecon.active != false and lecon.niveau == "debutant" %}
 
 <h3><a href="{{ lecon.url | relative_url }}">{{ lecon.title }}</a></h3>
-<p>Auteur: {{ lecon.auteur }}</p>
+<p>Prof: {{ lecon.prof }}</p>
 {% endif %}
 {% endfor %}
