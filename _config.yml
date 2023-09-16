@@ -34,10 +34,25 @@ include: ['_pages']
 collections:
   ressources:
     output: true
-    layout: default
     permalink: /:collection/:name
 
-collections_dir: collections  
+collections_dir: collections
+
+defaults:
+  - scope:
+      path: ""
+      type: "ressources"
+    values:
+      layout: "default"
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+  - scope:
+      path: ""
+    values:
+      layout: "default"
 
 # Exclude from processing.
 # The following items will not be processed, by default.
