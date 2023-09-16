@@ -45,6 +45,17 @@
 
 								<!-- Sidebar -->
 									<section id="sidebar">
+                                        {% if page.sidebar = "resources" %}
+                                        <section>
+											<h3>Autres ressources</h3>
+											<ul>
+                                                {% for ressource in site.ressources %}
+                                                <li><a href="{{ ressource.url | relative_url }}">{{ ressource.title }}</a> {{ ressource.key }}</li>
+                                                {% endfor %}
+                                            </ul>
+										</section>
+                                        {% endif %}
+
 										<!--<section>
 											<h3>Magna Feugiat</h3>
 											<p>Sed tristique purus vitae volutpat commodo suscipit amet sed nibh. Proin a ullamcorper sed blandit. Sed tristique purus vitae volutpat commodo suscipit ullamcorper commodo suscipit amet sed nibh. Proin a ullamcorper sed blandit..</p>

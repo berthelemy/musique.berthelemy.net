@@ -44,6 +44,7 @@ defaults:
       type: "ressources"
     values:
       layout: "default"
+      sidebar: "resources"
   - scope:
       path: ""
       type: "posts"
