@@ -3,8 +3,8 @@
     object-fit: cover;
 }
 
-#header {
-    position: sticky;
+body.landing #header {
+    position: fixed;
     background-color: #000;
 }
 
