@@ -6,3 +6,22 @@ image:
 image-alt: 
 ---
 <p>Surveillez les vidéos et les ressources pour aider les joueurs débutants.</p>
+
+### Leçons
+
+<table>
+    <thead>
+        <th>Lecon</th>
+        <th>Objectifs</th>
+    </thead>
+    <tbody>
+        {%- for lecon in site.data.lecons -%}
+        <tr>
+            <td><p>{{ lecon.number }}</p></td>
+            <td>
+                    <p>{{ lecon.objectifs</p>
+            </td>
+        </tr>
+        {%- endfor -%}
+    </tbody>
+</table>
