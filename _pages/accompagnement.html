@@ -13,6 +13,7 @@ image-alt:
 
 <h3>{{ accompagnement.name | capitalize }}</h3>
 {% assign count = 1 %}
+{% assign length = accompagnement.items | size %}
 {% for item in accompagnement.items %}
 
 {% if item.youtube %}
@@ -22,15 +23,19 @@ image-alt:
 {% assign youtube-id = youtube-id-array[0] %}
 {% assign thumbnail-link = youtube-id | prepend: "https://img.youtube.com/vi/" | append: "/mqdefault.jpg" %}
 {% endif %}
-{{ count }}
-{% if count == 1 %}<div class="row">{% endif %}
-<div class="col-6 col-12-medium">
-<img src="{{ thumbnail-link }}" alt="Youtube thumbnail" style="width: 33%; float:left; margin-right: 1rem;"/>
-<h3><a href="{{ item.url | relative_url }}">{{ item.title }}</a></h3>
 
-<p>Tonalité: {{ item.key }}</p>
+{% assign mod = count | modulo: 2 %}
+{% if mod != 0 %}<div class="row">{% endif %}
+<div class="col-6 col-12-medium">
+    <img src="{{ thumbnail-link }}" alt="Youtube thumbnail" style="width: 33%; float:left; margin-right: 1rem;"/>
+    <h3><a href="{{ item.url | relative_url }}">{{ item.title }}</a></h3>
+    <p>Tonalité: {{ item.key }}</p>
 </div>
-{% if count == 2 %}</div>{% assign count = 1 %}{% else %}{% assign count = 2 %}{% endif %}
+
+{% assign count = count | plus:1 %}
+{% assign mod = count | modulo: 2 %}
+{% if mod == 0 or count == length %}</div>{% endif %}
+
 
 
 {% endfor %}
