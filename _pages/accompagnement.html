@@ -5,8 +5,6 @@ layout: no-sidebar
 image: 
 image-alt: 
 ---
-<div class="row">
-   
 {% assign count = 1 %}
 {% for accompagnement in site.accompagnements %}
 {% if accompagnement.active != false %}
@@ -17,7 +15,7 @@ image-alt:
 <p>Type: {{ accompagnement.type }}</p>
 <p>Niveau: {{ accompagnement.difficulty }}</p>
 </div>
-{% if count == 2 %}</div>{% assign count = 1 %}{% else assign count = 2 %}{% endif %}
+{% if count == 2 %}</div>{% assign count = 1 %}{% else %}{% assign count = 2 %}{% endif %}
 
 
 {% endif %}
