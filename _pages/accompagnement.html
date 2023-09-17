@@ -6,7 +6,7 @@ image:
 image-alt: 
 ---
 
-{% assign accs = accompagnements | group_by: "difficulty" %}
+{% assign accs = site.accompagnements | group_by: "difficulty" %}
 {{ accs }}
 {% assign count = 1 %}
 {% for accompagnement in accs %}
