@@ -8,11 +8,11 @@ image-alt:
 
 {% assign accs = site.accompagnements | group_by: "difficulty" %}
 
-{% assign count = 1 %}
+
 {% for accompagnement in accs %}
 
-<h3>{{ accompagnement.name }}</h3>
-
+<h3>{{ accompagnement.name | upcase }}</h3>
+{% assign count = 1 %}
 {% for item in accompagnement.items %}
 
 {% if item.youtube %}
