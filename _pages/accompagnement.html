@@ -26,13 +26,12 @@ image-alt:
 {% if count == 1 %}<div class="row">{% endif %}
 <div class="col-6 col-12-medium">
 <h3><a href="{{ item.url | relative_url }}">{{ accompagnement.title }}</a></h3>
-<img src="{{ thumbnail-link }}" alt="Youtube thumbnail" style="float:left"/>
+<img src="{{ thumbnail-link }}" alt="Youtube thumbnail" style="float:left; margin-right: 1rem;"/>
 <p>Tonalité: {{ item.key }}</p>
 </div>
 {% if count == 2 %}</div>{% assign count = 1 %}{% else %}{% assign count = 2 %}{% endif %}
 
 
-{% endif %}
 {% endfor %}
 {% if count == 1 %}</div>{% endif %}
 {% endfor %}
