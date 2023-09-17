@@ -7,7 +7,7 @@ image-alt:
 ---
 
 {% assign accs = site.accompagnements | group_by: "difficulty" %}
-{{ accs }}
+
 {% assign count = 1 %}
 {% for accompagnement in accs %}
 
@@ -20,13 +20,14 @@ image-alt:
 {% assign youtube-id = link-array[3] %}
 {% assign youtube-id-array = youtube-id | split: "?" %}
 {% assign youtube-id = youtube-id-array[0] %}
-{% assign thumbnail-link = youtube-id | prepend: "https://img.youtube.com/vi/" | append: "/hqdefault.jpg" %}
+{% assign thumbnail-link = youtube-id | prepend: "https://img.youtube.com/vi/" | append: "/mqdefault.jpg" %}
 {% endif %}
 
 {% if count == 1 %}<div class="row">{% endif %}
 <div class="col-6 col-12-medium">
-<h3><a href="{{ item.url | relative_url }}">{{ accompagnement.title }}</a></h3>
-<img src="{{ thumbnail-link }}" alt="Youtube thumbnail" style="float:left; margin-right: 1rem;"/>
+<img src="{{ thumbnail-link }}" alt="Youtube thumbnail" style="width: 33%; float:left; margin-right: 1rem;"/>
+<h3><a href="{{ item.url | relative_url }}">{{ item.title }}</a></h3>
+
 <p>Tonalité: {{ item.key }}</p>
 </div>
 {% if count == 2 %}</div>{% assign count = 1 %}{% else %}{% assign count = 2 %}{% endif %}
