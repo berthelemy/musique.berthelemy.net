@@ -6,39 +6,40 @@ image:
 image-alt: 
 ---
 
-{% assign accs = site.accompagnements | group_by: "difficulty" %}
+{%- assign accs = site.accompagnements | group_by: "difficulty" -%}
 
 
-{% for accompagnement in accs %}
+{%- for accompagnement in accs -%}
 
 <h3>{{ accompagnement.name | capitalize }}</h3>
 
-{% assign count = 1 %}
-{% assign length = accompagnement.items | size %}
+{%- assign count = 1 -%}
+{%- assign length = accompagnement.items | size -%}
 
-{% for item in accompagnement.items %}
-{% if item.youtube %}
-    {% assign link-array = item.youtube | split: "/" %}
-    {% assign youtube-id = link-array[3] %}
-    {% assign youtube-id-array = youtube-id | split: "?" %}
-    {% assign youtube-id = youtube-id-array[0] %}
-    {% assign thumbnail-link = youtube-id | prepend: "https://img.youtube.com/vi/" | append: "/mqdefault.jpg" %}
-{% endif %}
+{%- for item in accompagnement.items -%}
+{%- if item.youtube -%}
+    {%- assign link-array = item.youtube | split: "/" -%}
+    {%- assign youtube-id = link-array[3] -%}
+    {%- assign youtube-id-array = youtube-id | split: "?" -%}
+    {%- assign youtube-id = youtube-id-array[0] -%}
+    {%- assign thumbnail-link = youtube-id | prepend: "https://img.youtube.com/vi/" | append: "/mqdefault.jpg" -%}
+{%- endif -%}
 
-{% assign mod = count | modulo: 2 %}
-{% if mod != 0 %}<div class="row">{% endif %}
+{%- assign mod = count | modulo: 2 -%}
+{%- if mod != 0 -%}<div class="row">{%- endif -%}
 <div class="col-6 col-12-medium">
     <img src="{{ thumbnail-link }}" alt="Youtube thumbnail" style="width: 33%; float:left; margin-right: 1rem;"/>
     <h3><a href="{{ item.url | relative_url }}">{{ item.title }}</a></h3>
     <p>Tonalité: {{ item.key }}</p>
+    <p>length: {{ length }}, count: {{ count }}</p>
 </div>
-{% assign mod = count | modulo: 2 %}
-{% if mod == 0 %}</div>{% endif %}
-{% assign count = count | plus: 1 %}
-{% if count == length %}</div><!-- end of section -->{% assign count = 1 %}{% endif %}
+{%- assign mod = count | modulo: 2 -%}
+{%- if mod == 0 %}</div>{% endif -%}
+{%- assign count = count | plus: 1 -%}
+{%- if count == length -%}</div><!-- end of section -->{%- assign count = 1 -%}{%- endif -%}
 
 
 
-{% endfor %}
-{% if count == 1 %}</div>{% endif %}
-{% endfor %}
+{%- endfor -%}
+{%- if count == 1 %}</div>{% endif -%}
+{%- endfor -%}
