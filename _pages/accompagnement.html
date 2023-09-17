@@ -12,16 +12,17 @@ image-alt:
 {% for accompagnement in accs %}
 
 <h3>{{ accompagnement.name | capitalize }}</h3>
+
 {% assign count = 1 %}
 {% assign length = accompagnement.items | size %}
-{% for item in accompagnement.items %}
 
+{% for item in accompagnement.items %}
 {% if item.youtube %}
-{% assign link-array = item.youtube | split: "/" %}
-{% assign youtube-id = link-array[3] %}
-{% assign youtube-id-array = youtube-id | split: "?" %}
-{% assign youtube-id = youtube-id-array[0] %}
-{% assign thumbnail-link = youtube-id | prepend: "https://img.youtube.com/vi/" | append: "/mqdefault.jpg" %}
+    {% assign link-array = item.youtube | split: "/" %}
+    {% assign youtube-id = link-array[3] %}
+    {% assign youtube-id-array = youtube-id | split: "?" %}
+    {% assign youtube-id = youtube-id-array[0] %}
+    {% assign thumbnail-link = youtube-id | prepend: "https://img.youtube.com/vi/" | append: "/mqdefault.jpg" %}
 {% endif %}
 
 {% assign mod = count | modulo: 2 %}
@@ -31,11 +32,10 @@ image-alt:
     <h3><a href="{{ item.url | relative_url }}">{{ item.title }}</a></h3>
     <p>Tonalité: {{ item.key }}</p>
 </div>
-
-{% assign count = count | plus:1 %}
 {% assign mod = count | modulo: 2 %}
 {% if mod == 0 %}</div>{% endif %}
-{% if count == length %}</div>{% assign count = 1 %}{% endif %}
+{% assign count = count | plus: 1 %}
+{% if count == length %}</div><!-- end of section -->{% assign count = 1 %}{% endif %}
 
 
 
