@@ -31,7 +31,7 @@ image-alt:
     <img src="{{ thumbnail-link }}" alt="Youtube thumbnail" style="width: 33%; float:left; margin-right: 1rem;"/>
     <h3><a href="{{ item.url | relative_url }}">{{ item.title }}</a></h3>
     <p>Tonalité: {{ item.key }}</p>
-    <p>length: {{ length }}, count: {{ count }}</p>
+    <!--<p>length: {{ length }}, count: {{ count }}</p>-->
 </div>
 
 {%- assign mod = count | modulo: 2 -%}
