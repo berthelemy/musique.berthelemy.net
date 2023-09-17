@@ -5,11 +5,9 @@ layout: no-sidebar
 image: 
 image-alt: 
 ---
-{% assign lecons-sorted = site.lecons | sort: "title" %}
-{% for lecon in lecons-sorted %}
-{% if lecon.active != false and lecon.niveau == "debutant" %}
 
-<h3><a href="{{ lecon.url | relative_url }}">{{ lecon.title }}</a></h3>
-<p>Prof: {{ lecon.prof }}</p>
-{% endif %}
-{% endfor %}
+Ces vidéos de Augustin Guefif vous aideront à vous souvenir pendant que vous vous entraînez à la maison.
+
+<div class="video-container">
+<iframe src="https://www.youtube.com/embed/videoseries?si=s_NgOQ39jw8JAVy5&amp;list=PLcyjo8pGR6ayBMC5f_yHeNbLHkR7yB1cw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+</div>
