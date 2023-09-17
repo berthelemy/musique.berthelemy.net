@@ -5,9 +5,7 @@ layout: no-sidebar
 image: 
 image-alt: 
 ---
-<p>Surveillez les vidéos et les ressources pour aider les joueurs débutants.</p>
-
-### Leçons
+<h3>Leçons</h3>
 
 <table>
     <thead>
@@ -19,7 +17,11 @@ image-alt:
         <tr>
             <td><p>{{ lecon.number }}</p></td>
             <td>
-                    <p>{{ lecon.objectifs }}</p>
+                <ul>
+                    {%- for objectif in lecon.objectifs -%}
+                    <li>{{ objectif }}</li>
+                    {%- endfor -%}
+                </ul>
             </td>
         </tr>
         {%- endfor -%}

@@ -1,14 +1,17 @@
 - number: 1
-  objectifs: |
-    Inspirer et expirer en utilisant le diaphragme.
-    Tenir l'instrument dans une bonne position.
-    Produire une note Do ou Sol.
-    Décrire la fonction des différentes parties de l'instrument.
+  objectifs:
+    - Inspirer et expirer en utilisant le diaphragme.
+    - Tenir l'instrument dans une bonne position.
+    - Produire une note Do ou Sol.
+    - Décrire la fonction des différentes parties de l'instrument.
 - number: 2
-  objectifs: |
-    To introduce music notation: stave, time signature, la ronde, la croche, key signature
-    To practice warming up exercises
-    To practice listening to notes and playing them
+  objectifs:
+    - Introduire la notation musicale - la portée, la signature temporelle, la ronde, la croche, la clé.
+    - Pratiquer des exercices d'échauffement
+    - S'entraîner à écouter les notes et à les jouer
 - number: 3
-  objectifs: |
-    
+  objectifs:
+    - Introduire la gamme de Do à Sol et vice-versa
+    - Entendre des rythmes et les répéter
+    - Entendre des notes et les rejouer
+    - Pratiquer la lecture à vue de la notation musicale
