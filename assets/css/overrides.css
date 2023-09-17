@@ -3,6 +3,11 @@
     object-fit: cover;
 }
 
+#header {
+    position: sticky;
+    background-color: #000;
+}
+
 .video-container {
     position: relative;
     margin-left: auto;
