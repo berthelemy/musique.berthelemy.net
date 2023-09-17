@@ -5,12 +5,23 @@ layout: no-sidebar
 image: 
 image-alt: 
 ---
+
+
+
 {% assign count = 1 %}
 {% for accompagnement in site.accompagnements %}
 {% if accompagnement.active != false %}
+
+{% if accompagnement.youtube %}
+{% assign link-array = accompagnement.youtube | split: "/" %}
+{% assign youtube-id = link-array[3] %}
+{% assign thumbnail-link = youtube-id | prepend: "https://img.youtube.com/vi/" | append: "/hqdefault.jpg" %}
+{% endif %}
+
 {% if count == 1 %}<div class="row">{% endif %}
 <div class="col-6 col-12-medium">
 <h3><a href="{{ accompagnement.url | relative_url }}">{{ accompagnement.title }}</a></h3>
+<img src="{{ thumbnail-link }}" alt="Youtube thumbnail" style="float:left"/>
 <p>Tonalité: {{ accompagnement.key }}</p>
 <p>Type: {{ accompagnement.type }}</p>
 <p>Niveau: {{ accompagnement.difficulty }}</p>
