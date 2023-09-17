@@ -34,7 +34,8 @@ image-alt:
 
 {% assign count = count | plus:1 %}
 {% assign mod = count | modulo: 2 %}
-{% if mod == 0 or count == length %}</div>{% endif %}
+{% if mod == 0 %}</div>{% endif %}
+{% if count == length %}</div>{% assign count = 1 %}{% endif %}
 
 
 
