@@ -5,11 +5,20 @@ layout: no-sidebar
 image: 
 image-alt: 
 ---
+<div class="row">
+   
+{% assign count = 1 %}
 {% for accompagnement in site.accompagnements %}
 {% if accompagnement.active != false %}
+{% if count == 1 %}<div class="row">{% endif %}
+<div class="col-6 col-12-medium">
 <h3><a href="{{ accompagnement.url | relative_url }}">{{ accompagnement.title }}</a></h3>
 <p>Tonalité: {{ accompagnement.key }}</p>
 <p>Type: {{ accompagnement.type }}</p>
 <p>Niveau: {{ accompagnement.difficulty }}</p>
+</div>
+{% if count == 2 %}</div>{% assign count = 1 %}{% else assign count = 2 %}{% endif %}
+
+
 {% endif %}
 {% endfor %}
