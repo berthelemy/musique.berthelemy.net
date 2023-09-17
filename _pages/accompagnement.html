@@ -11,7 +11,7 @@ image-alt:
 
 {% for accompagnement in accs %}
 
-<h3>{{ accompagnement.name | upcase }}</h3>
+<h3>{{ accompagnement.name | capitalize }}</h3>
 {% assign count = 1 %}
 {% for item in accompagnement.items %}
 
@@ -22,7 +22,7 @@ image-alt:
 {% assign youtube-id = youtube-id-array[0] %}
 {% assign thumbnail-link = youtube-id | prepend: "https://img.youtube.com/vi/" | append: "/mqdefault.jpg" %}
 {% endif %}
-
+{{ count }}
 {% if count == 1 %}<div class="row">{% endif %}
 <div class="col-6 col-12-medium">
 <img src="{{ thumbnail-link }}" alt="Youtube thumbnail" style="width: 33%; float:left; margin-right: 1rem;"/>
