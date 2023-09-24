@@ -9,7 +9,7 @@ image-alt:
 
 <table>
     <thead>
-        <th>Lecon</th>
+        <th>Leçon</th>
         <th>Objectifs</th>
     </thead>
     <tbody>
@@ -22,6 +22,7 @@ image-alt:
                     <li>{{ objectif }}</li>
                     {%- endfor -%}
                 </ul>
+                {% if lecon.youtube %}<p><i class="fas fa-external-link-alt"></i>&nbsp;<a href="{{ lecon.youtube }}" target="_blank">Leçon {{ lecon.number }} video</a></p>
             </td>
         </tr>
         {%- endfor -%}
