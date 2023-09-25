@@ -22,7 +22,8 @@ image-alt:
                     <li>{{ objectif }}</li>
                     {%- endfor -%}
                 </ul>
-                {%- if lecon.youtube -%}<p><a href="{{ lecon.youtube }}" target="_blank">Leçon {{ lecon.number }} video: {{ lecon.youtube-name }}</a>&nbsp;<i class="fas fa-external-link-alt"></i></p>{%- endif -%}
+                {%- if lecon.youtube -%}<h4>Leçon {{ lecon.number }} video</h4>
+                <p><a href="{{ lecon.youtube }}" target="_blank">{{ lecon.youtube-name }}</a>&nbsp;<i class="fas fa-external-link-alt"></i></p>{%- endif -%}
             </td>
         </tr>
         {%- endfor -%}
