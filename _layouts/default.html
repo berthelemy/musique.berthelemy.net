@@ -20,15 +20,15 @@
 
 								<!-- Content -->
 									<section id="content">
-                                        {% if page.youtube %}
+                                        <!--{% if page.youtube %}
                                         {% assign link-array = page.youtube | split: "/" %}
                                         {% assign youtube-id = link-array[3] %}
                                         {% assign embed-link = "https://www.youtube.com/embed/" | append: youtube-id %}
                                         {% include youtube-embed.html link=embed-link %}
                                         
 										{% else %}
-                                        <div class="image fit"><img src="images/{{ page.image }}" alt="{{ page.image-alt }}" /></div>
-										{% endif %}
+                                        <div class="image fit"><img src="{{ site.baseurl }}images/{{ page.image }}" alt="{{ page.image-alt }}" /></div>
+										<!--{% endif %}-->
                                         
                                         {{ content }}
 									</section>
