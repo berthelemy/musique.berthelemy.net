@@ -6,6 +6,8 @@ image: IMG_7137-1600.jpg
 image-alt: Un homme qui joue la trompette
 
 ---
+<div class="image fit"><img src="{{ site.baseurl }}images/{{ page.image }}" alt="{{ page.image-alt }}" /></div>
+
 Crédit image: <a href="https://www.facebook.com/Meffecrea/" target="_blank">Meffe Photographies</a>
 
 Mark Berthelemy, en plus de ses rôles de consultant informatique et de spécialiste de l’apprentissage en ligne, partage son expertise dans le domaine des cuivres.
