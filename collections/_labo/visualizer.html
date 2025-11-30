@@ -1,0 +1,146 @@
+---
+title: Visualizer
+---
+
+
+<section>
+    <p id="status">Cliquez sur « Démarrer » pour autoriser l'accès au microphone et visualiser la forme d'onde.</p>
+    <p>Essayez différents sons pour voir ce qui se passe.</p>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+        <button id="startBtn">Démarrer</button>
+        <button id="stopBtn" disabled>Stop</button>
+    </div>
+    <canvas id="osc" width="1024" height="256" style="width:100%;max-width:1024px;border:1px solid #ccc;background:#111;"></canvas>
+</section>
+
+<script>
+(() => {
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const status = document.getElementById('status');
+    const canvas = document.getElementById('osc');
+    const ctx = canvas.getContext('2d');
+
+    let audioCtx = null;
+    let analyser = null;
+    let dataArray = null;
+    let rafId = null;
+    let mediaStream = null;
+
+    function resizeCanvasToDisplaySize() {
+        const dpr = window.devicePixelRatio || 1;
+        const width = canvas.clientWidth * dpr;
+        const height = canvas.clientHeight * dpr;
+        if (canvas.width !== width || canvas.height !== height) {
+            canvas.width = width;
+            canvas.height = height;
+        }
+    }
+
+    function draw() {
+        if (!analyser) return;
+        analyser.getByteTimeDomainData(dataArray);
+        resizeCanvasToDisplaySize();
+        const W = canvas.width;
+        const H = canvas.height;
+
+        ctx.clearRect(0, 0, W, H);
+
+        // background
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, W, H);
+
+        // center line
+        ctx.strokeStyle = '#444';
+        ctx.lineWidth = Math.max(1, W / 1024);
+        ctx.beginPath();
+        ctx.moveTo(0, H / 2);
+        ctx.lineTo(W, H / 2);
+        ctx.stroke();
+
+        // waveform
+        ctx.lineWidth = Math.max(2, W / 512);
+        const gradient = ctx.createLinearGradient(0, 0, W, 0);
+        gradient.addColorStop(0, '#00e');
+        gradient.addColorStop(0.5, '#0f0');
+        gradient.addColorStop(1, '#e00');
+        ctx.strokeStyle = gradient;
+
+        ctx.beginPath();
+        const sliceWidth = W / dataArray.length;
+        for (let i = 0; i < dataArray.length; i++) {
+            const v = dataArray[i] / 128.0; // 0..2
+            const y = (v * H) / 2;
+            const x = i * sliceWidth;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // peak indicator (simple RMS)
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+            const n = (dataArray[i] - 128) / 128;
+            sum += n * n;
+        }
+        const rms = Math.sqrt(sum / dataArray.length);
+        const peakH = Math.min(H / 2, rms * H);
+        ctx.fillStyle = 'rgba(255,255,255,0.08)';
+        ctx.fillRect(W - 6, H / 2 - peakH, 6, peakH * 2);
+
+        rafId = requestAnimationFrame(draw);
+    }
+
+    async function start() {
+        startBtn.disabled = true;
+        status.textContent = 'Demande d\'accès au microphone...';
+        try {
+            mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        } catch (err) {
+            status.textContent = 'Accès au microphone refusé ou indisponible.';
+            startBtn.disabled = false;
+            return;
+        }
+
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const src = audioCtx.createMediaStreamSource(mediaStream);
+
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 2048;
+        const bufferLength = analyser.fftSize;
+        dataArray = new Uint8Array(bufferLength);
+
+        src.connect(analyser);
+
+        status.textContent = 'Visualisation de la forme d\'onde audio.';
+        stopBtn.disabled = false;
+
+        // ensure context is running (some browsers require user gesture)
+        if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+        draw();
+    }
+
+    function stop() {
+        stopBtn.disabled = true;
+        startBtn.disabled = false;
+        status.textContent = 'Stopped.';
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = null;
+        if (analyser) analyser.disconnect();
+        analyser = null;
+        if (audioCtx) {
+            try { audioCtx.close(); } catch (e) {}
+            audioCtx = null;
+        }
+        if (mediaStream) {
+            mediaStream.getTracks().forEach(t => t.stop());
+            mediaStream = null;
+        }
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    startBtn.addEventListener('click', start);
+    stopBtn.addEventListener('click', stop);
+})();
+</script>

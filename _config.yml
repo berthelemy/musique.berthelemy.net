@@ -40,6 +40,9 @@ collections:
   lecons:
     output: true
     permalink: /:collection/:name
+  labo:
+    output: true
+    permalink: /:collection/:name
 
 collections_dir: collections
 
@@ -52,15 +55,21 @@ defaults:
       sidebar: "accompagnements"
   - scope:
       path: ""
-      type: "lecons"
+      type: "labo"
     values:
       layout: "default"
-      sidebar: "lecons"
   - scope:
       path: ""
       type: "posts"
     values:
-      layout: "post"
+      layout: "article"
+      permalink: /articles/:categories/:slug
+  - scope:
+      path: ""
+      type: "lecons"
+    values:
+      layout: "default"
+      sidebar: "lecons"
   - scope:
       path: ""
     values:
