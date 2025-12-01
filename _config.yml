@@ -21,7 +21,7 @@
 title: Mark Berthelemy - Musique
 email: mark@berthelemy.net
 description: Ressources pour soutenir les cours de cuivres
-baseurl: "/"
+# baseurl: "/"
 domain: musique.berthelemy.net
 url: "https://musique.berthelemy.net" # the base hostname & protocol for your site, e.g. http://example.com
 image: "pipe-37816_1280.png"
