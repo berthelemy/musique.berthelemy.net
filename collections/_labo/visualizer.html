@@ -7,8 +7,8 @@ title: Visualizer
     <p id="status">Cliquez sur « Démarrer » pour autoriser l'accès au microphone et visualiser la forme d'onde.</p>
     <p>Essayez différents sons pour voir ce qui se passe.</p>
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
-        <button id="startBtn">Démarrer</button>
-        <button id="stopBtn" disabled>Stop</button>
+        <a id="startBtn" class="button primary">Démarrer</a>
+        <a id="stopBtn" disabled class="button">Stop</a>
     </div>
     <canvas id="osc" width="1024" height="256" style="width:100%;max-width:1024px;border:1px solid #ccc;background:#111;"></canvas>
 </section>
@@ -124,7 +124,7 @@ title: Visualizer
     function stop() {
         stopBtn.disabled = true;
         startBtn.disabled = false;
-        status.textContent = 'Stopped.';
+        status.textContent = 'Arrêté.';
         if (rafId) cancelAnimationFrame(rafId);
         rafId = null;
         if (analyser) analyser.disconnect();
