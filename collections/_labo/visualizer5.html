@@ -1,0 +1,271 @@
+---
+title: Visualizer 5
+---
+
+
+<section>
+    <p id="status">Génère deux sinusoïdes et affiche la forme d'onde (somme des deux).</p>
+    <p>Utilisez les curseurs pour ajuster la fréquence et l'amplitude de chaque oscillateur, puis cliquez sur Démarrer.</p>
+
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px;">
+        <a id="startBtn" class="button primary">Démarrer</a>
+        <a id="stopBtn" disabled class="button">Stop</a>
+
+        <div style="display:flex;flex-direction:column;gap:6px;margin-left:16px;">
+            <strong>Oscillateur A</strong>
+            <label style="display:flex;align-items:center;gap:8px;">
+                Fréquence A:
+                <input id="freq1Slider" type="range" min="20" max="2000" step="1" value="440" />
+                <span id="freq1Val">440 Hz</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;">
+                Amplitude A:
+                <input id="amp1Slider" type="range" min="0" max="1" step="0.01" value="0.5" />
+                <span id="amp1Val">0.50</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;">
+                Type A:
+                <select id="type1Select">
+                    <option value="sine">Sinusoidal</option>
+                    <option value="square">Carré</option>
+                    <option value="sawtooth">Scie</option>
+                    <option value="triangle">Triangle</option>
+                </select>
+            </label>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:6px;margin-left:8px;">
+            <strong>Oscillateur B</strong>
+            <label style="display:flex;align-items:center;gap:8px;">
+                Fréquence B:
+                <input id="freq2Slider" type="range" min="20" max="2000" step="1" value="550" />
+                <span id="freq2Val">550 Hz</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;">
+                Amplitude B:
+                <input id="amp2Slider" type="range" min="0" max="1" step="0.01" value="0.5" />
+                <span id="amp2Val">0.50</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;">
+                Type B:
+                <select id="type2Select">
+                    <option value="sine">Sinusoidal</option>
+                    <option value="square">Carré</option>
+                    <option value="sawtooth">Scie</option>
+                    <option value="triangle">Triangle</option>
+                </select>
+            </label>
+        </div>
+    </div>
+
+    <canvas id="osc" width="1024" height="256" style="width:100%;max-width:1024px;border:1px solid #ccc;background:#111;"></canvas>
+</section>
+
+<script>
+(() => {
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const status = document.getElementById('status');
+    const canvas = document.getElementById('osc');
+    const ctx = canvas.getContext('2d');
+
+    const freq1Slider = document.getElementById('freq1Slider');
+    const amp1Slider = document.getElementById('amp1Slider');
+    const freq1Val = document.getElementById('freq1Val');
+    const amp1Val = document.getElementById('amp1Val');
+
+    const freq2Slider = document.getElementById('freq2Slider');
+    const amp2Slider = document.getElementById('amp2Slider');
+    const freq2Val = document.getElementById('freq2Val');
+    const amp2Val = document.getElementById('amp2Val');
+
+    // new: waveform type selects
+    const type1Select = document.getElementById('type1Select');
+    const type2Select = document.getElementById('type2Select');
+
+    let audioCtx = null;
+    let analyser = null;
+    let dataArray = null;
+    let rafId = null;
+
+    let oscillator1 = null;
+    let gain1 = null;
+    let oscillator2 = null;
+    let gain2 = null;
+
+    function resizeCanvasToDisplaySize() {
+        const dpr = window.devicePixelRatio || 1;
+        const width = canvas.clientWidth * dpr;
+        const height = canvas.clientHeight * dpr;
+        if (canvas.width !== width || canvas.height !== height) {
+            canvas.width = width;
+            canvas.height = height;
+        }
+    }
+
+    function draw() {
+        if (!analyser) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            return;
+        }
+        analyser.getByteTimeDomainData(dataArray);
+        resizeCanvasToDisplaySize();
+        const W = canvas.width;
+        const H = canvas.height;
+
+        ctx.clearRect(0, 0, W, H);
+
+        // background
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, W, H);
+
+        // center line
+        ctx.strokeStyle = '#444';
+        ctx.lineWidth = Math.max(1, W / 1024);
+        ctx.beginPath();
+        ctx.moveTo(0, H / 2);
+        ctx.lineTo(W, H / 2);
+        ctx.stroke();
+
+        // waveform
+        ctx.lineWidth = Math.max(2, W / 512);
+        const gradient = ctx.createLinearGradient(0, 0, W, 0);
+        gradient.addColorStop(0, '#00e');
+        gradient.addColorStop(0.5, '#0f0');
+        gradient.addColorStop(1, '#e00');
+        ctx.strokeStyle = gradient;
+
+        ctx.beginPath();
+        const sliceWidth = W / dataArray.length;
+        for (let i = 0; i < dataArray.length; i++) {
+            const v = dataArray[i] / 128.0; // 0..2
+            const y = (v * H) / 2;
+            const x = i * sliceWidth;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // peak indicator (simple RMS)
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+            const n = (dataArray[i] - 128) / 128;
+            sum += n * n;
+        }
+        const rms = Math.sqrt(sum / dataArray.length);
+        const peakH = Math.min(H / 2, rms * H);
+        ctx.fillStyle = 'rgba(255,255,255,0.08)';
+        ctx.fillRect(W - 6, H / 2 - peakH, 6, peakH * 2);
+
+        rafId = requestAnimationFrame(draw);
+    }
+
+    async function start() {
+        startBtn.disabled = true;
+        status.textContent = 'Initialisation...';
+
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // create analyser
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 2048;
+        const bufferLength = analyser.fftSize;
+        dataArray = new Uint8Array(bufferLength);
+
+        // Oscillator A
+        oscillator1 = audioCtx.createOscillator();
+        oscillator1.type = type1Select.value || 'sine';
+        oscillator1.frequency.value = Number(freq1Slider.value);
+
+        gain1 = audioCtx.createGain();
+        gain1.gain.value = Number(amp1Slider.value);
+
+        // Oscillator B
+        oscillator2 = audioCtx.createOscillator();
+        oscillator2.type = type2Select.value || 'sine';
+        oscillator2.frequency.value = Number(freq2Slider.value);
+
+        gain2 = audioCtx.createGain();
+        gain2.gain.value = Number(amp2Slider.value);
+
+        // connect both gains into the analyser (sum happens naturally)
+        oscillator1.connect(gain1);
+        gain1.connect(analyser);
+
+        oscillator2.connect(gain2);
+        gain2.connect(analyser);
+
+        analyser.connect(audioCtx.destination);
+
+        // ensure context is resumed before starting oscillators for best compatibility
+        if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+        // start oscillators
+        oscillator1.start();
+        oscillator2.start();
+
+        status.textContent = 'Lecture: somme de deux sinusoïdes';
+        stopBtn.disabled = false;
+
+        draw();
+    }
+
+    function stop() {
+        stopBtn.disabled = true;
+        startBtn.disabled = false;
+        status.textContent = 'Arrêté.';
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = null;
+
+        try { if (oscillator1) oscillator1.stop(); } catch (e) {}
+        try { if (oscillator2) oscillator2.stop(); } catch (e) {}
+
+        try { if (oscillator1) oscillator1.disconnect(); } catch (e) {}
+        try { if (gain1) gain1.disconnect(); } catch (e) {}
+        try { if (oscillator2) oscillator2.disconnect(); } catch (e) {}
+        try { if (gain2) gain2.disconnect(); } catch (e) {}
+        try { if (analyser) analyser.disconnect(); } catch (e) {}
+    }
+
+    // slider input events
+    freq1Slider.addEventListener('input', () => {
+        if (oscillator1) oscillator1.frequency.value = Number(freq1Slider.value);
+        freq1Val.textContent = `${freq1Slider.value} Hz`;
+    });
+    amp1Slider.addEventListener('input', () => {
+        if (gain1) gain1.gain.value = Number(amp1Slider.value);
+        amp1Val.textContent = amp1Slider.value.padStart(4, '0');
+    });
+
+    freq2Slider.addEventListener('input', () => {
+        if (oscillator2) oscillator2.frequency.value = Number(freq2Slider.value);
+        freq2Val.textContent = `${freq2Slider.value} Hz`;
+    });
+    amp2Slider.addEventListener('input', () => {
+        if (gain2) gain2.gain.value = Number(amp2Slider.value);
+        amp2Val.textContent = amp2Slider.value.padStart(4, '0');
+    });
+
+    // waveform type change handlers
+    type1Select.addEventListener('change', () => {
+        if (oscillator1) oscillator1.type = type1Select.value;
+    });
+    type2Select.addEventListener('change', () => {
+        if (oscillator2) oscillator2.type = type2Select.value;
+    });
+
+    startBtn.addEventListener('click', start);
+    stopBtn.addEventListener('click', stop);
+
+    // stop audio context on tab close
+    window.addEventListener('beforeunload', () => {
+        try { if (audioCtx) audioCtx.close(); } catch (e) {}
+    });
+
+    // initial UI sync
+    freq1Val.textContent = freq1Slider.value + ' Hz';
+    amp1Val.textContent = Number(amp1Slider.value).toFixed(2);
+    freq2Val.textContent = freq2Slider.value + ' Hz';
+    amp2Val.textContent = Number(amp2Slider.value).toFixed(2);
+})();
+</script>
