@@ -58,6 +58,7 @@ defaults:
       type: "labo"
     values:
       layout: "default"
+      sidebar: "labo"
   - scope:
       path: ""
       type: "posts"

@@ -1,0 +1,206 @@
+---
+title: Visualizer 1
+---
+
+
+<section>
+    <p id="status">Cliquez sur un son pour le lire et visualiser la forme d'onde.</p>
+    <p>Essayez différents sons pour voir ce qui se passe.</p>
+
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+        <a class="button soundBtn" data-src="/assets/sounds/mono-snare-one-hit-dry.mp3">Tambour</a>
+        <a class="button soundBtn" data-src="/assets/sounds/soft-guitar-note-c-major_C_major.mp3">Guitare</a>
+        <a class="button soundBtn" data-src="/assets/sounds/trumpet-crescendo_87bpm_C.mp3">Trompette</a>
+        <a class="button soundBtn" data-src="/assets/sounds/tuba-single-note_70bpm_C_major.mp3">Tuba</a>
+        <a id="stopBtn" class="button" style="margin-left:8px;">Stop</a>
+    </div>
+
+    <canvas id="osc" width="1024" height="256" style="width:100%;max-width:1024px;border:1px solid #ccc;background:#111;"></canvas>
+</section>
+
+<script>
+(() => {
+    const soundBtns = Array.from(document.querySelectorAll('.soundBtn'));
+    const stopBtn = document.getElementById('stopBtn');
+    const status = document.getElementById('status');
+    const canvas = document.getElementById('osc');
+    const ctx = canvas.getContext('2d');
+
+    let audioCtx = null;
+    let analyser = null;
+    let dataArray = null;
+    let rafId = null;
+
+    let currentAudioEl = null;
+    let currentSource = null;
+
+    function resizeCanvasToDisplaySize() {
+        const dpr = window.devicePixelRatio || 1;
+        const width = canvas.clientWidth * dpr;
+        const height = canvas.clientHeight * dpr;
+        if (canvas.width !== width || canvas.height !== height) {
+            canvas.width = width;
+            canvas.height = height;
+        }
+    }
+
+    function draw() {
+        if (!analyser) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            return;
+        }
+        analyser.getByteTimeDomainData(dataArray);
+        resizeCanvasToDisplaySize();
+        const W = canvas.width;
+        const H = canvas.height;
+
+        ctx.clearRect(0, 0, W, H);
+
+        // background
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, W, H);
+
+        // center line
+        ctx.strokeStyle = '#444';
+        ctx.lineWidth = Math.max(1, W / 1024);
+        ctx.beginPath();
+        ctx.moveTo(0, H / 2);
+        ctx.lineTo(W, H / 2);
+        ctx.stroke();
+
+        // waveform
+        ctx.lineWidth = Math.max(2, W / 512);
+        const gradient = ctx.createLinearGradient(0, 0, W, 0);
+        gradient.addColorStop(0, '#00e');
+        gradient.addColorStop(0.5, '#0f0');
+        gradient.addColorStop(1, '#e00');
+        ctx.strokeStyle = gradient;
+
+        ctx.beginPath();
+        const sliceWidth = W / dataArray.length;
+        for (let i = 0; i < dataArray.length; i++) {
+            const v = dataArray[i] / 128.0; // 0..2
+            const y = (v * H) / 2;
+            const x = i * sliceWidth;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // peak indicator (simple RMS)
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+            const n = (dataArray[i] - 128) / 128;
+            sum += n * n;
+        }
+        const rms = Math.sqrt(sum / dataArray.length);
+        const peakH = Math.min(H / 2, rms * H);
+        ctx.fillStyle = 'rgba(255,255,255,0.08)';
+        ctx.fillRect(W - 6, H / 2 - peakH, 6, peakH * 2);
+
+        rafId = requestAnimationFrame(draw);
+    }
+
+    function ensureAudioContext() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        return audioCtx;
+    }
+
+    function createAnalyser() {
+        if (!analyser) {
+            analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 2048;
+            const bufferLength = analyser.fftSize;
+            dataArray = new Uint8Array(bufferLength);
+        }
+    }
+
+    async function playSound(url) {
+        // stop any current playback
+        stopPlayback();
+
+        status.textContent = 'Lecture : ' + url.split('/').pop();
+
+        ensureAudioContext();
+        // some browsers require resume on user gesture
+        if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+        createAnalyser();
+
+        // create audio element
+        currentAudioEl = new Audio(url);
+        currentAudioEl.crossOrigin = "anonymous"; // allow analyser for remote sources if CORS enabled
+        currentAudioEl.loop = false;
+        currentAudioEl.autoplay = false;
+
+        // create source node and connect -> analyser -> destination
+        try {
+            currentSource = audioCtx.createMediaElementSource(currentAudioEl);
+        } catch (e) {
+            // fallback (very old browsers)
+            status.textContent = 'Impossible de créer la source audio.';
+            currentAudioEl = null;
+            currentSource = null;
+            return;
+        }
+
+        currentSource.connect(analyser);
+        analyser.connect(audioCtx.destination);
+
+        // play
+        try {
+            await currentAudioEl.play();
+        } catch (e) {
+            status.textContent = 'Lecture bloquée. Cliquez à nouveau pour autoriser la lecture.';
+            // still start draw so the UI is responsive
+        }
+
+        draw();
+    }
+
+    function stopPlayback() {
+        stopBtn.disabled = true;
+        status.textContent = 'Arrêté.';
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = null;
+
+        if (currentAudioEl) {
+            try { currentAudioEl.pause(); } catch (e) {}
+            try { currentAudioEl.currentTime = 0; } catch (e) {}
+            currentAudioEl = null;
+        }
+        if (currentSource) {
+            try { currentSource.disconnect(); } catch (e) {}
+            currentSource = null;
+        }
+        if (analyser) {
+            try { analyser.disconnect(); } catch (e) {}
+            analyser = null;
+            dataArray = null;
+        }
+        // keep audioCtx open so subsequent plays are fast; close only if desired
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        stopBtn.disabled = false;
+    }
+
+    // wire up buttons
+    soundBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const src = btn.getAttribute('data-src');
+            if (!src) return;
+            playSound(src);
+        });
+    });
+
+    stopBtn.addEventListener('click', stopPlayback);
+
+    // clean up when page is unloaded
+    window.addEventListener('beforeunload', () => {
+        if (audioCtx) {
+            try { audioCtx.close(); } catch (e) {}
+        }
+    });
+})();
+</script>
