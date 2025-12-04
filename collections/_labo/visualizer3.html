@@ -1,0 +1,209 @@
+---
+title: Visualizer 3
+---
+
+
+<section>
+    <p id="status">Génère une sinusoïde et affiche la forme d'onde.</p>
+    <p>Utilisez les curseurs pour ajuster la fréquence et l'amplitude, puis cliquez sur Démarrer.</p>
+
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px;">
+        <a id="startBtn" class="button primary">Démarrer</a>
+        <a id="stopBtn" disabled class="button">Stop</a>
+
+        <label style="display:flex;align-items:center;gap:8px;margin-left:16px;">
+            Fréquence:
+            <input id="freqSlider" type="range" min="20" max="2000" step="1" value="440" />
+            <span id="freqVal">440 Hz</span>
+        </label>
+
+        <label style="display:flex;align-items:center;gap:8px;">
+            Amplitude:
+            <input id="ampSlider" type="range" min="0" max="1" step="0.01" value="0.5" />
+            <span id="ampVal">0.50</span>
+        </label>
+    </div>
+
+    <canvas id="osc" width="1024" height="256" style="width:100%;max-width:1024px;border:1px solid #ccc;background:#111;"></canvas>
+</section>
+
+<script>
+(() => {
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const status = document.getElementById('status');
+    const canvas = document.getElementById('osc');
+    const ctx = canvas.getContext('2d');
+
+    const freqSlider = document.getElementById('freqSlider');
+    const ampSlider = document.getElementById('ampSlider');
+    const freqVal = document.getElementById('freqVal');
+    const ampVal = document.getElementById('ampVal');
+
+    let audioCtx = null;
+    let analyser = null;
+    let dataArray = null;
+    let rafId = null;
+
+    let oscillator = null;
+    let gainNode = null;
+
+    function resizeCanvasToDisplaySize() {
+        const dpr = window.devicePixelRatio || 1;
+        const width = canvas.clientWidth * dpr;
+        const height = canvas.clientHeight * dpr;
+        if (canvas.width !== width || canvas.height !== height) {
+            canvas.width = width;
+            canvas.height = height;
+        }
+    }
+
+    function draw() {
+        if (!analyser) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            return;
+        }
+        analyser.getByteTimeDomainData(dataArray);
+        resizeCanvasToDisplaySize();
+        const W = canvas.width;
+        const H = canvas.height;
+
+        ctx.clearRect(0, 0, W, H);
+
+        // background
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, W, H);
+
+        // center line
+        ctx.strokeStyle = '#444';
+        ctx.lineWidth = Math.max(1, W / 1024);
+        ctx.beginPath();
+        ctx.moveTo(0, H / 2);
+        ctx.lineTo(W, H / 2);
+        ctx.stroke();
+
+        // waveform
+        ctx.lineWidth = Math.max(2, W / 512);
+        const gradient = ctx.createLinearGradient(0, 0, W, 0);
+        gradient.addColorStop(0, '#00e');
+        gradient.addColorStop(0.5, '#0f0');
+        gradient.addColorStop(1, '#e00');
+        ctx.strokeStyle = gradient;
+
+        ctx.beginPath();
+        const sliceWidth = W / dataArray.length;
+        for (let i = 0; i < dataArray.length; i++) {
+            const v = dataArray[i] / 128.0; // 0..2
+            const y = (v * H) / 2;
+            const x = i * sliceWidth;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // peak indicator (simple RMS)
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+            const n = (dataArray[i] - 128) / 128;
+            sum += n * n;
+        }
+        const rms = Math.sqrt(sum / dataArray.length);
+        const peakH = Math.min(H / 2, rms * H);
+        ctx.fillStyle = 'rgba(255,255,255,0.08)';
+        ctx.fillRect(W - 6, H / 2 - peakH, 6, peakH * 2);
+
+        rafId = requestAnimationFrame(draw);
+    }
+
+    async function start() {
+        startBtn.disabled = true;
+        status.textContent = 'Initialisation...';
+
+        // create audio context on user gesture
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // create nodes
+        oscillator = audioCtx.createOscillator();
+        oscillator.type = 'sine';
+        oscillator.frequency.value = Number(freqSlider.value);
+
+        gainNode = audioCtx.createGain();
+        gainNode.gain.value = Number(ampSlider.value);
+
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 2048;
+        const bufferLength = analyser.fftSize;
+        dataArray = new Uint8Array(bufferLength);
+
+        // connect graph: oscillator -> gain -> analyser -> destination
+        oscillator.connect(gainNode);
+        gainNode.connect(analyser);
+        analyser.connect(audioCtx.destination);
+
+        // start oscillator
+        oscillator.start();
+
+        // resume context if suspended
+        if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+        status.textContent = 'Lecture: sinusoïde';
+        stopBtn.disabled = false;
+
+        draw();
+    }
+
+    function stop() {
+        stopBtn.disabled = true;
+        startBtn.disabled = false;
+        status.textContent = 'Arrêté.';
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = null;
+
+        try {
+            if (oscillator) {
+                oscillator.stop();
+                oscillator.disconnect();
+            }
+        } catch (e) {}
+
+        try { if (gainNode) gainNode.disconnect(); } catch (e) {}
+        try { if (analyser) analyser.disconnect(); } catch (e) {}
+
+        oscillator = null;
+        gainNode = null;
+        analyser = null;
+        dataArray = null;
+
+        if (audioCtx) {
+            try { audioCtx.close(); } catch (e) {}
+            audioCtx = null;
+        }
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // update parameter UI and live nodes if running
+    freqSlider.addEventListener('input', () => {
+        const f = Number(freqSlider.value);
+        freqVal.textContent = f + ' Hz';
+        if (oscillator) {
+            try { oscillator.frequency.setValueAtTime(f, audioCtx.currentTime); } catch (e) {}
+        }
+    });
+
+    ampSlider.addEventListener('input', () => {
+        const a = Number(ampSlider.value);
+        ampVal.textContent = a.toFixed(2);
+        if (gainNode) {
+            try { gainNode.gain.setValueAtTime(a, audioCtx.currentTime); } catch (e) {}
+        }
+    });
+
+    startBtn.addEventListener('click', start);
+    stopBtn.addEventListener('click', stop);
+
+    // keep UI values in sync on load
+    freqVal.textContent = freqSlider.value + ' Hz';
+    ampVal.textContent = Number(ampSlider.value).toFixed(2);
+})();
+</script>
