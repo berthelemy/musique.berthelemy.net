@@ -1,0 +1,15 @@
+menuitems:
+  - title: À propos
+    url: /a-propos
+  - title: Cuivres
+    url: /cuivres
+    subfolderitems:
+      - page: Débutants
+        url: /cuivres/debutants
+      - page: Playlists
+        url: /cuivres/playlists
+  - title: Technologie musicale
+    url: /technologie
+    subfolderitems:
+      - page: Comprendre le son
+        url: /technologie/comprendre-le-son

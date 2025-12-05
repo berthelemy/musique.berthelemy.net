@@ -48,13 +48,13 @@
                                             </ul>
 										</section>
                                         {% endif %}
-										{% if page.sidebar == "labo" %}
+										{% if page.sidebar == "technologie" %}
                                         <section>
 											<h3>Autres expériences</h3>
 											<ul>
-                                                {% for lab in site.labo %}
-												{%- if lab.url != page.url -%}
-                                                <li><a href="{{ lab.url | relative_url }}">{{ lab.title }}</a></li>
+                                                {% for item in site.technologie %}
+												{%- if item.url != page.url -%}
+                                                <li><a href="{{ item.url | relative_url }}">{{ item.title }}</a></li>
 												{%- endif -%}
                                                 {% endfor %}
                                             </ul>

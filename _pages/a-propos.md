@@ -10,7 +10,7 @@ image-alt: Un homme qui joue la trompette
 
 Crédit image: <a href="https://www.facebook.com/Meffecrea/" target="_blank">Meffe Photographies</a>
 
-Mark Berthelemy, en plus de ses rôles de consultant informatique et de spécialiste de l'apprentissage en ligne, partage son expertise dans le domaine des cuivres.
+Mark Berthelemy, en plus de ses rôles de consultant informatique et de spécialiste de l'apprentissage en ligne, partage son expertise dans le domaine des cuivres et téchnologie musicale.
 
 À l'âge de 11 ans, il a débuté son parcours musical en jouant du cornet au sein d'une fanfare au Royaume-Uni. Par la suite, il a rapidement intégré la scène musicale locale des jeunes, participant à des orchestres, des petits ensembles de cuivres, des orchestres d'harmonie, et même au big band des jeunes. C'est à cette époque qu'il a également entamé des études musicales qui l'ont conduit jusqu'en 8e année. Sa passion pour le chant l'a également conduit à s'investir dans des chorales.
 

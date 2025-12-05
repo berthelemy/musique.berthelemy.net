@@ -20,7 +20,7 @@
 
 title: Mark Berthelemy - Musique
 email: mark@berthelemy.net
-description: Ressources pour soutenir les cours de cuivres
+description: Ressources pour soutenir les cours de cuivres et téchnologie musicale
 # baseurl: "/"
 domain: musique.berthelemy.net
 url: "https://musique.berthelemy.net" # the base hostname & protocol for your site, e.g. http://example.com
@@ -40,7 +40,7 @@ collections:
   lecons:
     output: true
     permalink: /:collection/:name
-  labo:
+  technologie:
     output: true
     permalink: /:collection/:name
 
@@ -55,10 +55,10 @@ defaults:
       sidebar: "accompagnements"
   - scope:
       path: ""
-      type: "labo"
+      type: "technologie"
     values:
       layout: "default"
-      sidebar: "labo"
+      sidebar: "technologie"
   - scope:
       path: ""
       type: "posts"

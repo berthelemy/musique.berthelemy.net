@@ -1,0 +1,22 @@
+---
+layout: no-sidebar
+---
+{{ content }}
+<div class="container">
+{%- for item in site.data.menu.menuitems -%}
+{%- if page.url == item.url -%}
+<div class="row">
+{%- for subitem in item.subfolderitems -%}
+<div class="col-6">
+    <p><a href="{{ subitem.url }}">{{ subitem.page }}</a></p>
+    {%- for page in site.pages -%}
+    {%- if page.url == subitem.url and page.description != null -%}
+    <p>{{ page.description }}</p>
+    {%- endif -%}
+    {%- endfor -%}
+</div>
+{%- endfor -%}
+</div>
+{%- endif -%}
+{%- endfor -%}
+</div>

@@ -1,0 +1,314 @@
+---
+title: Regardez les notes
+description: Que se passe-t-il lorsque vous choisir des notes differents ?
+---
+
+
+<section>
+    <p id="status">Génère une sinusoïde et affiche la forme d'onde.</p>
+    <p>Utilisez les curseurs pour ajuster la fréquence et l'amplitude, puis cliquez sur Démarrer.</p>
+
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px;">
+        <a id="stopBtn" disabled class="button primary">Stop</a>
+
+        <label style="display:flex;align-items:center;gap:8px;margin-left:16px;">
+            Amplitude:
+            <input id="ampSlider" type="range" min="0" max="1" step="0.01" value="0.5" />
+            <span id="ampVal">0.50</span>
+        </label>
+    </div>
+
+    <canvas id="osc" width="1024" height="256" style="width:100%;max-width:1024px;border:1px solid #ccc;background:#111;"></canvas>
+
+    <div style="margin-top:24px;">
+        <h3>Clavier (2 octaves, centré sur La 440Hz)</h3>
+        <div id="pianoContainer" style="display:flex;gap:2px;margin-top:8px;overflow-x:auto;padding:8px;background:#222;border-radius:4px;"></div>
+    </div>
+</section>
+
+<script>
+(() => {
+    const stopBtn = document.getElementById('stopBtn');
+    const status = document.getElementById('status');
+    const canvas = document.getElementById('osc');
+    const ctx = canvas.getContext('2d');
+
+    
+    const ampSlider = document.getElementById('ampSlider');
+    const ampVal = document.getElementById('ampVal');
+
+    let audioCtx = null;
+    let analyser = null;
+    let dataArray = null;
+    let rafId = null;
+
+    let oscillator = null;
+    let gainNode = null;
+
+    let held = true; // always frozen, updates on note change
+
+    function resizeCanvasToDisplaySize() {
+        const dpr = window.devicePixelRatio || 1;
+        const width = canvas.clientWidth * dpr;
+        const height = canvas.clientHeight * dpr;
+        if (canvas.width !== width || canvas.height !== height) {
+            canvas.width = width;
+            canvas.height = height;
+        }
+    }
+
+    function draw() {
+        if (!analyser) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            return;
+        }
+        analyser.getByteTimeDomainData(dataArray);
+        resizeCanvasToDisplaySize();
+        const W = canvas.width;
+        const H = canvas.height;
+
+        ctx.clearRect(0, 0, W, H);
+
+        // background
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, W, H);
+
+        // center line
+        ctx.strokeStyle = '#444';
+        ctx.lineWidth = Math.max(1, W / 1024);
+        ctx.beginPath();
+        ctx.moveTo(0, H / 2);
+        ctx.lineTo(W, H / 2);
+        ctx.stroke();
+
+        // waveform
+        ctx.lineWidth = Math.max(2, W / 512);
+        const gradient = ctx.createLinearGradient(0, 0, W, 0);
+        gradient.addColorStop(0, '#00e');
+        gradient.addColorStop(0.5, '#0f0');
+        gradient.addColorStop(1, '#e00');
+        ctx.strokeStyle = gradient;
+
+        ctx.beginPath();
+        const sliceWidth = W / dataArray.length;
+        for (let i = 0; i < dataArray.length; i++) {
+            const v = dataArray[i] / 128.0; // 0..2
+            const y = (v * H) / 2;
+            const x = i * sliceWidth;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // peak indicator (simple RMS)
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+            const n = (dataArray[i] - 128) / 128;
+            sum += n * n;
+        }
+        const rms = Math.sqrt(sum / dataArray.length);
+        const peakH = Math.min(H / 2, rms * H);
+        ctx.fillStyle = 'rgba(255,255,255,0.08)';
+        ctx.fillRect(W - 6, H / 2 - peakH, 6, peakH * 2);
+    }
+
+    async function start() {
+        startBtn.disabled = true;
+        status.textContent = 'Initialisation...';
+
+        // create audio context on user gesture
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // create nodes
+        oscillator = audioCtx.createOscillator();
+        oscillator.type = 'sine';
+        oscillator.frequency.value = 440;
+
+        gainNode = audioCtx.createGain();
+        gainNode.gain.value = Number(ampSlider.value);
+
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 2048;
+        const bufferLength = analyser.fftSize;
+        dataArray = new Uint8Array(bufferLength);
+
+        // connect graph: oscillator -> gain -> analyser -> destination
+        oscillator.connect(gainNode);
+        gainNode.connect(analyser);
+        analyser.connect(audioCtx.destination);
+
+        // start oscillator
+        oscillator.start();
+
+        // resume context if suspended
+        if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+        status.textContent = 'Lecture: sinusoïde';
+        stopBtn.disabled = false;
+
+        // draw single frozen snapshot
+        if (analyser) {
+            analyser.getByteTimeDomainData(dataArray);
+            draw();
+        }
+    }
+
+    function stop() {
+        stopBtn.disabled = true;
+        status.textContent = 'Arrêté.';
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = null;
+
+        try {
+            if (oscillator) {
+                oscillator.stop();
+                oscillator.disconnect();
+            }
+        } catch (e) {}
+
+        try { if (gainNode) gainNode.disconnect(); } catch (e) {}
+        try { if (analyser) analyser.disconnect(); } catch (e) {}
+
+        oscillator = null;
+        gainNode = null;
+        analyser = null;
+        dataArray = null;
+
+        if (audioCtx) {
+            try { audioCtx.close(); } catch (e) {}
+            audioCtx = null;
+        }
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // update parameter UI and live nodes if running
+    ampSlider.addEventListener('input', () => {
+        const a = Number(ampSlider.value);
+        ampVal.textContent = a.toFixed(2);
+        if (gainNode) {
+            try { gainNode.gain.setValueAtTime(a, audioCtx.currentTime); } catch (e) {}
+        }
+    });
+
+    stopBtn.addEventListener('click', stop);
+
+    // keep UI values in sync on load
+    ampVal.textContent = Number(ampSlider.value).toFixed(2);
+
+    // piano setup
+    const pianoContainer = document.getElementById('pianoContainer');
+    const A4 = 440; // reference frequency
+    
+    // note names and semitone offsets from A4 (-12 = A3, 0 = A4, 12 = A5)
+    const notes = [
+        { name: 'A', semitones: -12, isBlack: false },
+        { name: 'A#', semitones: -11, isBlack: true },
+        { name: 'B', semitones: -10, isBlack: false },
+        { name: 'C', semitones: -9, isBlack: false },
+        { name: 'C#', semitones: -8, isBlack: true },
+        { name: 'D', semitones: -7, isBlack: false },
+        { name: 'D#', semitones: -6, isBlack: true },
+        { name: 'E', semitones: -5, isBlack: false },
+        { name: 'F', semitones: -4, isBlack: false },
+        { name: 'F#', semitones: -3, isBlack: true },
+        { name: 'G', semitones: -2, isBlack: false },
+        { name: 'G#', semitones: -1, isBlack: true },
+        { name: 'A', semitones: 0, isBlack: false },
+        { name: 'A#', semitones: 1, isBlack: true },
+        { name: 'B', semitones: 2, isBlack: false },
+        { name: 'C', semitones: 3, isBlack: false },
+        { name: 'C#', semitones: 4, isBlack: true },
+        { name: 'D', semitones: 5, isBlack: false },
+        { name: 'D#', semitones: 6, isBlack: true },
+        { name: 'E', semitones: 7, isBlack: false },
+        { name: 'F', semitones: 8, isBlack: false },
+        { name: 'F#', semitones: 9, isBlack: true },
+        { name: 'G', semitones: 10, isBlack: false },
+        { name: 'G#', semitones: 11, isBlack: true },
+        { name: 'A', semitones: 12, isBlack: false },
+    ];
+
+    function noteToFreq(semitones) {
+        return A4 * Math.pow(2, semitones / 12);
+    }
+
+    function createPianoKey(note) {
+        const freq = noteToFreq(note.semitones);
+        const key = document.createElement('button');
+        key.className = note.isBlack ? 'piano-key-black' : 'piano-key-white';
+        key.innerHTML = `${note.name}<br/><small>${freq.toFixed(1)}Hz</small>`;
+        key.style.cssText = note.isBlack ?
+            'width:30px;height:80px;background:#222;color:#fff;border:1px solid #444;border-radius:2px;cursor:pointer;font-size:9px;padding:2px;box-sizing:border-box;position:relative;margin-left:-15px;margin-right:-15px;z-index:10;transition:background 0.1s;' :
+            'width:50px;height:120px;background:#fff;border:1px solid #999;border-radius:2px;cursor:pointer;font-size:10px;padding:4px;box-sizing:border-box;transition:background 0.1s;';
+
+        key.addEventListener('mousedown', () => {
+            playNote(freq);
+            key.style.background = note.isBlack ? '#444' : '#eee';
+        });
+
+        key.addEventListener('mouseup', () => {
+            key.style.background = note.isBlack ? '#222' : '#fff';
+        });
+
+        key.addEventListener('mouseleave', () => {
+            key.style.background = note.isBlack ? '#222' : '#fff';
+        });
+
+        return key;
+    }
+
+    async function playNote(freq) {
+        // if audio context doesn't exist, create it on first note press
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+            oscillator = audioCtx.createOscillator();
+            oscillator.type = 'sine';
+
+            gainNode = audioCtx.createGain();
+            gainNode.gain.value = Number(ampSlider.value);
+
+            analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 2048;
+            const bufferLength = analyser.fftSize;
+            dataArray = new Uint8Array(bufferLength);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(analyser);
+            analyser.connect(audioCtx.destination);
+
+            oscillator.start();
+
+            if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+            status.textContent = 'Lecture: sinusoïde';
+            stopBtn.disabled = false;
+        }
+        
+        if (oscillator) {
+            try { 
+                oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime); 
+                
+                // apply decay envelope: fade out over 1.5 seconds
+                const now = audioCtx.currentTime;
+                const decayTime = 1.5;
+                gainNode.gain.cancelScheduledValues(now);
+                gainNode.gain.setValueAtTime(Number(ampSlider.value), now);
+                gainNode.gain.linearRampToValueAtTime(0, now + decayTime);
+                
+                // draw single snapshot
+                if (analyser) {
+                    analyser.getByteTimeDomainData(dataArray);
+                    draw();
+                }
+            } catch (e) {}
+        }
+    }
+
+    // populate piano
+    notes.forEach(note => {
+        pianoContainer.appendChild(createPianoKey(note));
+    });
+})();
+</script>

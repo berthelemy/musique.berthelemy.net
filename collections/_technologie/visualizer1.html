@@ -1,22 +1,27 @@
 ---
-title: 1 - Regardez des sons
+title: Regardez des sons
 order: 1
+description: À quoi ressemble un son ?
 ---
 
 
 <section>
-    <p id="status">Cliquez sur un son pour le lire et visualiser la forme d'onde.</p>
-    <p>Essayez différents sons pour voir ce qui se passe.</p>
+    <p>Essayez différents sons pour voir ce qui se passe. Est-ce que vous pouvez répondre aux questions ci-dessous?</p>
 
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
         <a class="button soundBtn" data-src="/assets/sounds/mono-snare-one-hit-dry.mp3">Tambour</a>
         <a class="button soundBtn" data-src="/assets/sounds/soft-guitar-note-c-major_C_major.mp3">Guitare</a>
         <a class="button soundBtn" data-src="/assets/sounds/trumpet-crescendo_87bpm_C.mp3">Trompette</a>
-        <a class="button soundBtn" data-src="/assets/sounds/tuba-single-note_70bpm_C_major.mp3">Tuba</a>
-        <a id="stopBtn" class="button" style="margin-left:8px;">Stop</a>
+        <a class="button soundBtn" data-src="/assets/sounds/tuba-single-note_70bpm_C_major.mp3">Tuba</a>     
     </div>
+    <p id="status">Cliquez sur un son pour le lire et visualiser la forme d'onde.</p>
+    
 
     <canvas id="osc" width="1024" height="256" style="width:100%;max-width:1024px;border:1px solid #ccc;background:#111;"></canvas>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+        <a id="holdBtn" class="button primary" style="margin-left:8px;">Tenez</a>
+        <a id="stopBtn" class="button" style="margin-left:8px;">Stop</a>
+    </div>
 </section>
 
 <section>
@@ -30,6 +35,7 @@ order: 1
 (() => {
     const soundBtns = Array.from(document.querySelectorAll('.soundBtn'));
     const stopBtn = document.getElementById('stopBtn');
+    const holdBtn = document.getElementById('holdBtn');
     const status = document.getElementById('status');
     const canvas = document.getElementById('osc');
     const ctx = canvas.getContext('2d');
@@ -41,6 +47,8 @@ order: 1
 
     let currentAudioEl = null;
     let currentSource = null;
+
+    let held = false; // when true, drawing is frozen (single snapshot)
 
     function resizeCanvasToDisplaySize() {
         const dpr = window.devicePixelRatio || 1;
@@ -106,7 +114,12 @@ order: 1
         ctx.fillStyle = 'rgba(255,255,255,0.08)';
         ctx.fillRect(W - 6, H / 2 - peakH, 6, peakH * 2);
 
-        rafId = requestAnimationFrame(draw);
+        // only continue looping if not held
+        if (!held) {
+            rafId = requestAnimationFrame(draw);
+        } else {
+            rafId = null; // frozen snapshot
+        }
     }
 
     function ensureAudioContext() {
@@ -129,7 +142,7 @@ order: 1
         // stop any current playback
         stopPlayback();
 
-        status.textContent = 'Lecture : ' + url.split('/').pop();
+        status.textContent = 'Status: Lecture - ' + url.split('/').pop();
 
         ensureAudioContext();
         // some browsers require resume on user gesture
@@ -165,12 +178,18 @@ order: 1
             // still start draw so the UI is responsive
         }
 
-        draw();
+        // start live draw unless user has toggled Hold
+        if (!held) draw();
+        else {
+            // if held, draw a single snapshot now
+            analyser.getByteTimeDomainData(dataArray);
+            draw(); // draw() will not loop because held==true
+        }
     }
 
     function stopPlayback() {
         stopBtn.disabled = true;
-        status.textContent = 'Arrêté.';
+        status.textContent = 'Status: Arrêté.';
         if (rafId) cancelAnimationFrame(rafId);
         rafId = null;
 
@@ -188,6 +207,14 @@ order: 1
             analyser = null;
             dataArray = null;
         }
+
+        // reset hold state when stopping
+        held = false;
+        if (holdBtn) {
+            holdBtn.textContent = 'Tenez';
+            holdBtn.classList.remove('is-active');
+        }
+
         // keep audioCtx open so subsequent plays are fast; close only if desired
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         stopBtn.disabled = false;
@@ -203,6 +230,29 @@ order: 1
     });
 
     stopBtn.addEventListener('click', stopPlayback);
+
+    // Hold button toggles frozen snapshot
+    holdBtn.addEventListener('click', () => {
+        held = !held;
+        holdBtn.textContent = held ? 'Tenu' : 'Tenez';
+        holdBtn.classList.toggle('is-active', held);
+        if (held) {
+            // stop the animation loop, keep the current drawing on screen
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+            // draw one final snapshot so visual doesn't change further
+            if (analyser) {
+                analyser.getByteTimeDomainData(dataArray);
+                // draw() will detect held==true and not schedule a new frame
+                draw();
+            }
+        } else {
+            // resume live drawing
+            if (analyser && !rafId) draw();
+        }
+    });
 
     // clean up when page is unloaded
     window.addEventListener('beforeunload', () => {

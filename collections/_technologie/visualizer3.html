@@ -1,17 +1,19 @@
 ---
-title: Visualizer 3
+title: La fréquence et l'amplitude
+description: Découvrez ce que nous entendons par ces mots.
 ---
 
 
 <section>
-    <p id="status">Génère une sinusoïde et affiche la forme d'onde.</p>
+    <p id="status">Génère une sinusoïde et affiche la forme d'onde. Est-ce que vous pouvez répondre aux questions ci-dessous?</p>
     <p>Utilisez les curseurs pour ajuster la fréquence et l'amplitude, puis cliquez sur Démarrer.</p>
 
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px;">
         <a id="startBtn" class="button primary">Démarrer</a>
         <a id="stopBtn" disabled class="button">Stop</a>
-
-        <label style="display:flex;align-items:center;gap:8px;margin-left:16px;">
+    </div>
+    <div>
+        <label style="display:flex;align-items:center;gap:8px;">
             Fréquence:
             <input id="freqSlider" type="range" min="20" max="2000" step="1" value="440" />
             <span id="freqVal">440 Hz</span>
@@ -25,6 +27,13 @@ title: Visualizer 3
     </div>
 
     <canvas id="osc" width="1024" height="256" style="width:100%;max-width:1024px;border:1px solid #ccc;background:#111;"></canvas>
+</section>
+
+<section>
+    <h2>Activités</h2>
+    <p>Que se passe-t-il lorsqu'on change la fréquence ? Que devient le son ? Que devient l'image ?</p>
+    <p>Le hertz (Hz) correspond au nombre de vibrations par seconde. On appelle cela la « fréquence ». Quelle est la fréquence la plus basse que vous puissiez entendre ?</p>
+    <p>Que se passe-t-il lorsque vous modifiez l'amplitude ? Que devient le son ? Que devient l'image ?</p>
 </section>
 
 <script>
@@ -59,11 +68,6 @@ title: Visualizer 3
     }
 
     function draw() {
-        if (!analyser) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            return;
-        }
-        analyser.getByteTimeDomainData(dataArray);
         resizeCanvasToDisplaySize();
         const W = canvas.width;
         const H = canvas.height;
@@ -82,7 +86,10 @@ title: Visualizer 3
         ctx.lineTo(W, H / 2);
         ctx.stroke();
 
-        // waveform
+        // draw mathematical sine wave
+        const freq = Number(freqSlider.value);
+        const amp = Number(ampSlider.value);
+
         ctx.lineWidth = Math.max(2, W / 512);
         const gradient = ctx.createLinearGradient(0, 0, W, 0);
         gradient.addColorStop(0, '#00e');
@@ -91,24 +98,22 @@ title: Visualizer 3
         ctx.strokeStyle = gradient;
 
         ctx.beginPath();
-        const sliceWidth = W / dataArray.length;
-        for (let i = 0; i < dataArray.length; i++) {
-            const v = dataArray[i] / 128.0; // 0..2
-            const y = (v * H) / 2;
-            const x = i * sliceWidth;
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
+        const timeWindow = 0.01; // 10ms window to show ~freq/100 cycles
+        const samplesPerPixel = (timeWindow / (W / 1)) * 44100; // assuming 44.1kHz
+        
+        for (let px = 0; px < W; px++) {
+            const t = (px / W) * timeWindow;
+            const angle = 2 * Math.PI * freq * t;
+            const v = amp * Math.sin(angle); // -amp to +amp
+            const y = H / 2 - (v * H / 2); // flip so positive goes up
+            
+            if (px === 0) ctx.moveTo(px, y);
+            else ctx.lineTo(px, y);
         }
         ctx.stroke();
 
-        // peak indicator (simple RMS)
-        let sum = 0;
-        for (let i = 0; i < dataArray.length; i++) {
-            const n = (dataArray[i] - 128) / 128;
-            sum += n * n;
-        }
-        const rms = Math.sqrt(sum / dataArray.length);
-        const peakH = Math.min(H / 2, rms * H);
+        // peak indicator
+        const peakH = amp * H / 2;
         ctx.fillStyle = 'rgba(255,255,255,0.08)';
         ctx.fillRect(W - 6, H / 2 - peakH, 6, peakH * 2);
 

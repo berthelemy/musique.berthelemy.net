@@ -1,22 +1,31 @@
 ---
-title: Visualizer 2
+title: Visualizer vos sons
+description: Observez les formes de vos propres sons.
 ---
 
 
 <section>
-    <p id="status">Cliquez sur « Démarrer » pour autoriser l'accès au microphone et visualiser la forme d'onde.</p>
-    <p>Essayez différents sons pour voir ce qui se passe.</p>
+    <p>Essayez différents sons pour voir ce qui se passe. Est-ce que vous pouvez répondre aux questions ci-dessous?</p>
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
         <a id="startBtn" class="button primary">Démarrer</a>
+        <a id="holdBtn" class="button" style="margin-left:8px;">Tenez</a>
         <a id="stopBtn" disabled class="button">Stop</a>
     </div>
+    <p id="status">Cliquez sur « Démarrer » pour autoriser l'accès au microphone et visualiser la forme d'onde.</p>
     <canvas id="osc" width="1024" height="256" style="width:100%;max-width:1024px;border:1px solid #ccc;background:#111;"></canvas>
+</section>
+<section>
+    <h2>Activités</h2>
+    <p>Essayez de chanter, de siffler ou de jouer d'un instrument. Alternez entre notes aiguës et graves. Que se passe-t-il avec l'image ?</p>
+    <p>Trouvez un objet qui sonne quand vous le frappez. Comment l'image change-t-elle ?</p>
+    <p>Maintenant, frappez quelque chose qui ne sonne pas. Comment l'image change-t-elle ?</p>
 </section>
 
 <script>
 (() => {
     const startBtn = document.getElementById('startBtn');
     const stopBtn = document.getElementById('stopBtn');
+    const holdBtn = document.getElementById('holdBtn');
     const status = document.getElementById('status');
     const canvas = document.getElementById('osc');
     const ctx = canvas.getContext('2d');
@@ -26,6 +35,8 @@ title: Visualizer 2
     let dataArray = null;
     let rafId = null;
     let mediaStream = null;
+
+    let held = false; // when true, freeze the waveform (single snapshot)
 
     function resizeCanvasToDisplaySize() {
         const dpr = window.devicePixelRatio || 1;
@@ -88,16 +99,21 @@ title: Visualizer 2
         ctx.fillStyle = 'rgba(255,255,255,0.08)';
         ctx.fillRect(W - 6, H / 2 - peakH, 6, peakH * 2);
 
-        rafId = requestAnimationFrame(draw);
+        // continue only if not held
+        if (!held) {
+            rafId = requestAnimationFrame(draw);
+        } else {
+            rafId = null;
+        }
     }
 
     async function start() {
         startBtn.disabled = true;
-        status.textContent = 'Demande d\'accès au microphone...';
+        status.textContent = 'Status: Demande d\'accès au microphone...';
         try {
             mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
         } catch (err) {
-            status.textContent = 'Accès au microphone refusé ou indisponible.';
+            status.textContent = 'Status: Accès au microphone refusé ou indisponible.';
             startBtn.disabled = false;
             return;
         }
@@ -112,19 +128,24 @@ title: Visualizer 2
 
         src.connect(analyser);
 
-        status.textContent = 'Visualisation de la forme d\'onde audio.';
+        status.textContent = 'Status: Visualisation de la forme d\'onde audio.';
         stopBtn.disabled = false;
 
         // ensure context is running (some browsers require user gesture)
         if (audioCtx.state === 'suspended') await audioCtx.resume();
 
-        draw();
+        // start drawing or draw a single snapshot if held
+        if (!held) draw();
+        else {
+            analyser.getByteTimeDomainData(dataArray);
+            draw(); // draw() will not loop because held == true
+        }
     }
 
     function stop() {
         stopBtn.disabled = true;
         startBtn.disabled = false;
-        status.textContent = 'Arrêté.';
+        status.textContent = 'Status: Arrêté.';
         if (rafId) cancelAnimationFrame(rafId);
         rafId = null;
         if (analyser) analyser.disconnect();
@@ -138,9 +159,38 @@ title: Visualizer 2
             mediaStream = null;
         }
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // reset hold state when stopping
+        held = false;
+        if (holdBtn) {
+            holdBtn.textContent = 'Tenez';
+            holdBtn.classList.remove('is-active');
+        }
     }
 
     startBtn.addEventListener('click', start);
     stopBtn.addEventListener('click', stop);
+
+    // Hold button toggles frozen snapshot
+    holdBtn.addEventListener('click', () => {
+        held = !held;
+        holdBtn.textContent = held ? 'Tenu' : 'Tenez';
+        holdBtn.classList.toggle('is-active', held);
+
+        if (held) {
+            // stop animation loop and draw one final snapshot
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+            if (analyser) {
+                analyser.getByteTimeDomainData(dataArray);
+                draw(); // will not schedule further frames
+            }
+        } else {
+            // resume live drawing
+            if (analyser && !rafId) draw();
+        }
+    });
 })();
 </script>

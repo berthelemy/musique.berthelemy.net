@@ -1,22 +1,23 @@
 <head>
-    <title>{{ site.title }}</title>
+    <title>{{ site.title }} / {{ page.title }}</title>
+    {%- if page.description -%}{%- assign description = page.description -%}{%- else -%}{%- assign description = site.description -%}{%- endif -%}
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-    <meta name="description" content="{{ site.description }}">
+    <meta name="description" content="{{ description }}">
 
     <!-- Facebook Meta Tags -->
     <meta property="og:url" content="{{ site.url }}">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="{{ site.title }}">
-    <meta property="og:description" content="{{ site.description }}">
+    <meta property="og:title" content="{{ site.title }} / {{ page.title }}">
+    <meta property="og:description" content="{{ description }}">
     <meta property="og:image" content="{{ site.baseurl }}images/{{ site.image }}">
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta property="twitter:domain" content="{{ site.domain }}">
     <meta property="twitter:url" content="{{ site.url }}">
-    <meta name="twitter:title" content="{{ site.title }}">
-    <meta name="twitter:description" content="{{ site.description }}">
+    <meta name="twitter:title" content="{{ site.title }} / {{ page.title }}">
+    <meta name="twitter:description" content="{{ description }}">
     <meta name="twitter:image" content="{{ site.baseurl }}images/{{ site.image }}">
         
     <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}" />
