@@ -1,18 +1,19 @@
-<nav id="nav">
+<nav id="navmenu" class="navmenu">
     <ul>
-    {% for item in site.data.menu.menuitems %}
-    <li><a href="{{ item.url }}">{{ item.title }}</a>
-    {%- if item.subfolderitems -%}
+        {% for item in site.data.menu.menuitems %}
+        {% if page.url == item.url %}{% assign active = "active" %}{% else %}{% assign active = "" %}{% endif %}
+        {%- if item.subfolderitems -%}
+        <li class="dropdown"><a href="{{ item.url }}" class="{{ active }}">{{ item.title }} <i class="bi bi-chevron-down toggle-dropdown"></i></a>
         <ul>
         {% for entry in item.subfolderitems %}
-          <li><a href="{{ entry.url }}">{{ entry.page }}</a></li>
+          <li><a href="{{ entry.url }}" class="dropdown-item">{{ entry.page }}</a></li>
         {% endfor %}
-      </ul>
-    {%- endif -%}
-    
-    </li>
-    
-  {% endfor %}
-  </ul>
-    
+        </ul></li>
+        {% else %}
+         <li><a href="{{ item.url }}" class="{{ active }}">{{ item.title }}</a></li>
+         {% endif %}
+        {% endfor %}
+          
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>    
 </nav>

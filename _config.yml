@@ -25,6 +25,8 @@ description: Ressources pour soutenir les cours de cuivres et téchnologie music
 domain: musique.berthelemy.net
 url: "https://musique.berthelemy.net" # the base hostname & protocol for your site, e.g. http://example.com
 image: "pipe-37816_1280.png"
+facebook: https://www.facebook.com/mark.berthelemy/
+linkedin: https://www.linkedin.com/in/markberthelemy/
 
 # Build settings
 theme: minima

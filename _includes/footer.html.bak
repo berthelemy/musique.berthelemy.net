@@ -1,0 +1,16 @@
+<!-- Footer -->
+<footer id="footer">
+    
+<ul class="icons">
+    <li><a href="https://www.facebook.com/mark.berthelemy/" class="icon" target="_blank" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a></li>
+    <li><a href="https://www.linkedin.com/in/markberthelemy/" class="icon" target="_blank" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a></li>
+    <li><a href="mailto:mark.berthelemy@gmail.com" class="icon" target="_blank" title="Email"><i class="fa-solid fa-envelope"></i></a></li>
+    <li><a href="tel:+33662646657" class="icon" target="_blank" title="Téléphone"><i class="fa-solid fa-phone"></i></a></li>
+    
+</ul>
+
+    <ul class="copyright">
+        <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+        <li>Site content: <a href="https://mark.berthelemy.net">Mark Berthelemy</a></li>
+    </ul>
+</footer>

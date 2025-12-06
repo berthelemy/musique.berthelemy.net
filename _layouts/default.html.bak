@@ -1,0 +1,98 @@
+<!DOCTYPE HTML>
+
+<!--
+	Landed by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html lang="fr">
+	{% include head.html %}
+	<body class="is-preload">
+		<div id="page-wrapper" class="container">
+
+			{% include top-header.html %}
+
+			<!-- Main -->
+				<div id="main" class="container">
+					
+						{% include page-header.html %}
+						<div class="row">
+							<div class="col-8 col-12-medium">
+
+								<!-- Content -->
+									<section id="content" class="container">
+                                        <!--{% if page.youtube %}
+                                        {% assign link-array = page.youtube | split: "/" %}
+                                        {% assign youtube-id = link-array[3] %}
+                                        {% assign embed-link = "https://www.youtube.com/embed/" | append: youtube-id %}
+                                        {% include youtube-embed.html link=embed-link %}
+                                        
+										{% else %}
+                                        <div class="image fit"><img src="{{ site.baseurl }}images/{{ page.image }}" alt="{{ page.image-alt }}" /></div>
+										<!--{% endif %}-->
+                                        
+                                        {{ content }}
+									</section>
+
+							</div>
+							<div class="col-4 col-12-medium">
+
+								<!-- Sidebar -->
+									<section id="sidebar">
+                                        {% if page.sidebar == "accompagnements" %}
+                                        <section>
+											<h3>Autres accompagnements</h3>
+											<ul>
+                                                {% for accompagnement in site.accompagnements %}
+                                                <li><a href="{{ accompagnement.url | relative_url }}">{{ accompagnement.title }}</a><br />{{ accompagnement.key }}</li>
+                                                {% endfor %}
+                                            </ul>
+										</section>
+                                        {% endif %}
+										{% if page.sidebar == "technologie" %}
+                                        <section>
+											<h3>Autres expériences</h3>
+											<ul>
+                                                {% for item in site.technologie %}
+												{%- if item.url != page.url -%}
+                                                <li><a href="{{ item.url | relative_url }}">{{ item.title }}</a></li>
+												{%- endif -%}
+                                                {% endfor %}
+                                            </ul>
+										</section>
+                                        {% endif %}
+
+										<!--<section>
+											<h3>Magna Feugiat</h3>
+											<p>Sed tristique purus vitae volutpat commodo suscipit amet sed nibh. Proin a ullamcorper sed blandit. Sed tristique purus vitae volutpat commodo suscipit ullamcorper commodo suscipit amet sed nibh. Proin a ullamcorper sed blandit..</p>
+											<footer>
+												<ul class="actions">
+													<li><a href="#" class="button">Learn More</a></li>
+												</ul>
+											</footer>
+										</section>
+										<hr />
+										<section>
+											<a href="#" class="image fit"><img src="images/pic07.jpg" alt="" /></a>
+											<h3>Amet Lorem Tempus</h3>
+											<p>Sed tristique purus vitae volutpat commodo suscipit amet sed nibh. Proin a ullamcorper sed blandit. Sed tristique purus vitae volutpat commodo suscipit ullamcorper sed blandit lorem ipsum dolore.</p>
+											<footer>
+												<ul class="actions">
+													<li><a href="#" class="button">Learn More</a></li>
+												</ul>
+											</footer>
+										</section>-->
+									</section>
+
+							</div>
+						</div>
+					
+				</div>
+
+			{% include footer.html %}
+
+		</div>
+
+		{% include scripts.html %}
+	</body>
+</html>

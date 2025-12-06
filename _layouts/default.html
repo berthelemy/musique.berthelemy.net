@@ -1,97 +1,106 @@
-<!DOCTYPE HTML>
-<!--
-	Landed by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
-<html>
-	{% include head.html %}
-	<body class="is-preload">
-		<div id="page-wrapper">
+<!DOCTYPE html>
+<html lang="fr">
 
-			{% include top-header.html %}
+{% include head.html %}
 
-			<!-- Main -->
-				<div id="main" class="wrapper style1">
-					<div class="container">
-						{% include page-header.html %}
-						<div class="row gtr-150">
-							<div class="col-8 col-12-medium">
+<body class="index-page">
 
-								<!-- Content -->
-									<section id="content">
-                                        <!--{% if page.youtube %}
-                                        {% assign link-array = page.youtube | split: "/" %}
-                                        {% assign youtube-id = link-array[3] %}
-                                        {% assign embed-link = "https://www.youtube.com/embed/" | append: youtube-id %}
-                                        {% include youtube-embed.html link=embed-link %}
-                                        
-										{% else %}
-                                        <div class="image fit"><img src="{{ site.baseurl }}images/{{ page.image }}" alt="{{ page.image-alt }}" /></div>
-										<!--{% endif %}-->
-                                        
-                                        {{ content }}
-									</section>
+  <header id="header" class="header d-flex align-items-center light-background sticky-top">
+    <div class="container position-relative d-flex align-items-center justify-content-between">
 
-							</div>
-							<div class="col-4 col-12-medium">
+      <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
+      <img src="assets/img/logo.webp" alt="">
+      <h1 class="sitename">{{ site.title }}</h1> 
+    </a>
 
-								<!-- Sidebar -->
-									<section id="sidebar">
-                                        {% if page.sidebar == "accompagnements" %}
-                                        <section>
-											<h3>Autres accompagnements</h3>
-											<ul>
-                                                {% for accompagnement in site.accompagnements %}
-                                                <li><a href="{{ accompagnement.url | relative_url }}">{{ accompagnement.title }}</a><br />{{ accompagnement.key }}</li>
-                                                {% endfor %}
-                                            </ul>
-										</section>
-                                        {% endif %}
-										{% if page.sidebar == "technologie" %}
-                                        <section>
-											<h3>Autres expériences</h3>
-											<ul>
-                                                {% for item in site.technologie %}
-												{%- if item.url != page.url -%}
-                                                <li><a href="{{ item.url | relative_url }}">{{ item.title }}</a></li>
-												{%- endif -%}
-                                                {% endfor %}
-                                            </ul>
-										</section>
-                                        {% endif %}
+    {% include menu.html %}
+      
 
-										<!--<section>
-											<h3>Magna Feugiat</h3>
-											<p>Sed tristique purus vitae volutpat commodo suscipit amet sed nibh. Proin a ullamcorper sed blandit. Sed tristique purus vitae volutpat commodo suscipit ullamcorper commodo suscipit amet sed nibh. Proin a ullamcorper sed blandit..</p>
-											<footer>
-												<ul class="actions">
-													<li><a href="#" class="button">Learn More</a></li>
-												</ul>
-											</footer>
-										</section>
-										<hr />
-										<section>
-											<a href="#" class="image fit"><img src="images/pic07.jpg" alt="" /></a>
-											<h3>Amet Lorem Tempus</h3>
-											<p>Sed tristique purus vitae volutpat commodo suscipit amet sed nibh. Proin a ullamcorper sed blandit. Sed tristique purus vitae volutpat commodo suscipit ullamcorper sed blandit lorem ipsum dolore.</p>
-											<footer>
-												<ul class="actions">
-													<li><a href="#" class="button">Learn More</a></li>
-												</ul>
-											</footer>
-										</section>-->
-									</section>
+      <div class="header-social-links">
+        <a href="{{ site.facebook }}" class="facebook"><i class="bi bi-facebook"></i></a>
+        <a href="{{ site.linked }}" class="linkedin"><i class="bi bi-linkedin"></i></a>
+      </div>
 
-							</div>
-						</div>
-					</div>
-				</div>
+    </div>
+  </header>
 
-			{% include footer.html %}
+  <main class="main">
 
-		</div>
+    <!-- Hero Section -->
+    <section id="hero" class="hero section">
 
-		{% include scripts.html %}
-	</body>
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="row gy-4 align-items-center">
+          <div class="col-lg-6 order-2 order-lg-1">
+            <div class="hero-content">
+              <h1 data-aos="fade-up" data-aos-delay="200">Hello, I'm <span class="highlight">Brandon Johnson</span></h1>
+              <h2 data-aos="fade-up" data-aos-delay="300">Creative <span class="typed" data-typed-items="UI/UX Designer, Web Developer, Digital Artist, Brand Strategist"></span></h2>
+              <p data-aos="fade-up" data-aos-delay="400">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+              <div class="hero-actions" data-aos="fade-up" data-aos-delay="500">
+                <a href="portfolio.html" class="btn btn-primary">View My Work</a>
+                <a href="contact.html" class="btn btn-outline">Get In Touch</a>
+              </div>
+              <div class="social-links" data-aos="fade-up" data-aos-delay="600">
+                <a href="#"><i class="bi bi-twitter"></i></a>
+                <a href="#"><i class="bi bi-linkedin"></i></a>
+                <a href="#"><i class="bi bi-github"></i></a>
+                <a href="#"><i class="bi bi-dribbble"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6 order-1 order-lg-2">
+            <div class="hero-image" data-aos="zoom-in" data-aos-delay="300">
+              <div class="image-wrapper">
+                <img src="assets/img/profile/profile-square-11.webp" alt="Sarah Mitchell" class="img-fluid">
+                <div class="floating-elements">
+                  <div class="floating-card design" data-aos="fade-left" data-aos-delay="700">
+                    <i class="bi bi-palette"></i>
+                    <span>Design</span>
+                  </div>
+                  <div class="floating-card code" data-aos="fade-right" data-aos-delay="800">
+                    <i class="bi bi-code-slash"></i>
+                    <span>Code</span>
+                  </div>
+                  <div class="floating-card creativity" data-aos="fade-up" data-aos-delay="900">
+                    <i class="bi bi-lightbulb"></i>
+                    <span>Ideas</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section><!-- /Hero Section -->
+
+  </main>
+
+  {% include footer.html %}
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/typed.js/typed.umd.js"></script>
+  <script src="assets/vendor/waypoints/noframework.waypoints.js"></script>
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+
+  <!-- Main JS File -->
+  <script src="assets/js/main.js"></script>
+
+</body>
+
 </html>

@@ -1,8 +1,8 @@
-<header class="major">
+<div class="container">
     <h2>{{ page.title }}</h2>
     <p>{{ page.tagline }}</p>
-</header>
-<container>
+</div>
+<section class="container">
    
     <div id="breadcrumbs">
 {% assign crumbs = page.url | remove:'/index.html' | split: '/' %}
@@ -16,4 +16,4 @@
 {% endfor %}
 </div>
 
-</container>
+</section>

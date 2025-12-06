@@ -1,7 +1,7 @@
 ---
 title: À propos
 permalink: /a-propos
-layout: no-sidebar
+layout: default
 image: IMG_7137-1600.jpg
 image-alt: Un homme qui joue la trompette
 
