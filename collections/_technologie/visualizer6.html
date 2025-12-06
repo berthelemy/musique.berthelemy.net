@@ -1,5 +1,5 @@
 ---
-title: Visualizer 4
+title: Visualizer 6
 ---
 
 
@@ -23,6 +23,15 @@ title: Visualizer 4
                 <input id="amp1Slider" type="range" min="0" max="1" step="0.01" value="0.5" />
                 <span id="amp1Val">0.50</span>
             </label>
+            <label style="display:flex;align-items:center;gap:8px;">
+                Type A:
+                <select id="type1Select">
+                    <option value="sine">Sinusoidal</option>
+                    <option value="square">Carré</option>
+                    <option value="sawtooth">Scie</option>
+                    <option value="triangle">Triangle</option>
+                </select>
+            </label>
         </div>
 
         <div style="display:flex;flex-direction:column;gap:6px;margin-left:8px;">
@@ -36,6 +45,15 @@ title: Visualizer 4
                 Amplitude B:
                 <input id="amp2Slider" type="range" min="0" max="1" step="0.01" value="0.5" />
                 <span id="amp2Val">0.50</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;">
+                Type B:
+                <select id="type2Select">
+                    <option value="sine">Sinusoidal</option>
+                    <option value="square">Carré</option>
+                    <option value="sawtooth">Scie</option>
+                    <option value="triangle">Triangle</option>
+                </select>
             </label>
         </div>
     </div>
@@ -60,6 +78,10 @@ title: Visualizer 4
     const amp2Slider = document.getElementById('amp2Slider');
     const freq2Val = document.getElementById('freq2Val');
     const amp2Val = document.getElementById('amp2Val');
+
+    // new: waveform type selects
+    const type1Select = document.getElementById('type1Select');
+    const type2Select = document.getElementById('type2Select');
 
     let audioCtx = null;
     let analyser = null;
@@ -152,7 +174,7 @@ title: Visualizer 4
 
         // Oscillator A
         oscillator1 = audioCtx.createOscillator();
-        oscillator1.type = 'sine';
+        oscillator1.type = type1Select.value || 'sine';
         oscillator1.frequency.value = Number(freq1Slider.value);
 
         gain1 = audioCtx.createGain();
@@ -160,7 +182,7 @@ title: Visualizer 4
 
         // Oscillator B
         oscillator2 = audioCtx.createOscillator();
-        oscillator2.type = 'sine';
+        oscillator2.type = type2Select.value || 'sine';
         oscillator2.frequency.value = Number(freq2Slider.value);
 
         gain2 = audioCtx.createGain();
@@ -175,7 +197,7 @@ title: Visualizer 4
 
         analyser.connect(audioCtx.destination);
 
-        // ensure context is resumed before starting oscillators (better compatibility)
+        // ensure context is resumed before starting oscillators for best compatibility
         if (audioCtx.state === 'suspended') await audioCtx.resume();
 
         // start oscillators
@@ -195,25 +217,14 @@ title: Visualizer 4
         if (rafId) cancelAnimationFrame(rafId);
         rafId = null;
 
-        try { if (oscillator1) { oscillator1.stop(); oscillator1.disconnect(); } } catch (e) {}
+        try { if (oscillator1) oscillator1.stop(); } catch (e) {}
+        try { if (oscillator2) oscillator2.stop(); } catch (e) {}
+
+        try { if (oscillator1) oscillator1.disconnect(); } catch (e) {}
         try { if (gain1) gain1.disconnect(); } catch (e) {}
-        try { if (oscillator2) { oscillator2.stop(); oscillator2.disconnect(); } } catch (e) {}
+        try { if (oscillator2) oscillator2.disconnect(); } catch (e) {}
         try { if (gain2) gain2.disconnect(); } catch (e) {}
         try { if (analyser) analyser.disconnect(); } catch (e) {}
-
-        oscillator1 = null;
-        gain1 = null;
-        oscillator2 = null;
-        gain2 = null;
-        analyser = null;
-        dataArray = null;
-
-        if (audioCtx) {
-            try { audioCtx.close(); } catch (e) {}
-            audioCtx = null;
-        }
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
     // slider input events
@@ -235,6 +246,14 @@ title: Visualizer 4
         amp2Val.textContent = amp2Slider.value.padStart(4, '0');
     });
 
+    // waveform type change handlers
+    type1Select.addEventListener('change', () => {
+        if (oscillator1) oscillator1.type = type1Select.value;
+    });
+    type2Select.addEventListener('change', () => {
+        if (oscillator2) oscillator2.type = type2Select.value;
+    });
+
     startBtn.addEventListener('click', start);
     stopBtn.addEventListener('click', stop);
 
@@ -242,5 +261,11 @@ title: Visualizer 4
     window.addEventListener('beforeunload', () => {
         try { if (audioCtx) audioCtx.close(); } catch (e) {}
     });
+
+    // initial UI sync
+    freq1Val.textContent = freq1Slider.value + ' Hz';
+    amp1Val.textContent = Number(amp1Slider.value).toFixed(2);
+    freq2Val.textContent = freq2Slider.value + ' Hz';
+    amp2Val.textContent = Number(amp2Slider.value).toFixed(2);
 })();
 </script>
