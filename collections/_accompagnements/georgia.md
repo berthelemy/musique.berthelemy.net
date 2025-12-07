@@ -4,7 +4,7 @@ tagline: Jouer avec la piste d'accompagnement
 key: Fa majeur (F)
 type: backing-track
 difficulty: moyen
-youtube: https://youtu.be/y5TLruzdDKI?si=R0PkWgFnFiCRxrjy
+youtube: https://www.youtube.com/watch?v=y5TLruzdDKI
 active: true
 ---
 

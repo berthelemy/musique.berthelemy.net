@@ -4,32 +4,36 @@ order: 1
 description: À quoi ressemble un son ?
 ---
 
-
-<section>
-    <p>Essayez différents sons pour voir ce qui se passe. Est-ce que vous pouvez répondre aux questions ci-dessous?</p>
+<div class="container">
+    <div class="row g-5">
+        <div class="col-lg-8">
 
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
-        <a class="button soundBtn" data-src="/assets/sounds/mono-snare-one-hit-dry.mp3">Tambour</a>
-        <a class="button soundBtn" data-src="/assets/sounds/soft-guitar-note-c-major_C_major.mp3">Guitare</a>
-        <a class="button soundBtn" data-src="/assets/sounds/trumpet-crescendo_87bpm_C.mp3">Trompette</a>
-        <a class="button soundBtn" data-src="/assets/sounds/tuba-single-note_70bpm_C_major.mp3">Tuba</a>     
+        <a class="btn btn-light soundBtn" data-src="/assets/sounds/mono-snare-one-hit-dry.mp3">Tambour</a>
+        <a class="btn btn-light soundBtn" data-src="/assets/sounds/soft-guitar-note-c-major_C_major.mp3">Guitare</a>
+        <a class="btn btn-light soundBtn" data-src="/assets/sounds/trumpet-crescendo_87bpm_C.mp3">Trompette</a>
+        <a class="btn btn-light soundBtn" data-src="/assets/sounds/tuba-single-note_70bpm_C_major.mp3">Tuba</a>     
     </div>
     <p id="status">Cliquez sur un son pour le lire et visualiser la forme d'onde.</p>
     
 
     <canvas id="osc" width="1024" height="256" style="width:100%;max-width:1024px;border:1px solid #ccc;background:#111;"></canvas>
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
-        <a id="holdBtn" class="button primary" style="margin-left:8px;">Tenez</a>
-        <a id="stopBtn" class="button" style="margin-left:8px;">Stop</a>
+        <a id="holdBtn" class="btn btn-primary" style="margin-left:8px;">Tenez</a>
+        <a id="stopBtn" class="btn btn-secondary" style="margin-left:8px;">Stop</a>
     </div>
-</section>
+</div>
 
-<section>
-    <h2>Activités</h2>
+<div class="col-lg-4">
+    <h2>Questions</h2>
     <p>Que voyez-vous lorsque vous appuyez sur le bouton du tambour?</p>
     <p>Que voyez-vous lorsque le tuba et la trompette jouent leurs notes ? Que se passe-t-il avec l'image ?</p>
     <p>Quelle est la différence entre la guitare et la trompette ? Observez le début et la fin de la note.</p>
-</section>
+    <p>Regardez le commencement de chaque son. Comment cela évolue-t-il au fil du temps ?</p>
+</div>
+    </div>
+</div>
+
 
 <script>
 (() => {

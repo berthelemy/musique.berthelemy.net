@@ -1,22 +1,51 @@
 ---
-layout: no-sidebar
+layout: default
 ---
-{{ content }}
-<div class="container">
-{%- for item in site.data.menu.menuitems -%}
-{%- if page.url == item.url -%}
-<div class="row">
-{%- for subitem in item.subfolderitems -%}
-<div class="col-6">
-    <p><a href="{{ subitem.url }}">{{ subitem.page }}</a></p>
-    {%- for page in site.pages -%}
-    {%- if page.url == subitem.url and page.description != null -%}
-    <p>{{ page.description }}</p>
-    {%- endif -%}
-    {%- endfor -%}
-</div>
+
+<!-- Services Section -->
+    <section id="services" class="services section">
+
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>{{ page.title }}</h2>
+        <p>{{ page.description }}</p>
+      </div><!-- End Section Title -->
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        {%- for item in site.data.menu.menuitems -%}
+        
+        {%- if page.url == item.url -%}
+        
+        <div class="row justify-content-center g-5">
+
+        {%- for subitem in item.subfolderitems -%}
+        <div class="col-md-6" data-aos="fade-right" data-aos-delay="100">
+            <div class="service-item">
+              <div class="service-icon">
+                <i class="bi bi-{{ subitem.icon }}"></i>
+              </div>
+              <div class="service-content">
+                <h3>{{ subitem.page}}</h3>
+                
+                {%- for page in site.pages -%}
+                {%- if page.url == subitem.url and page.description != null -%}
+                <p>{{ page.description }}</p>
+                {%- endif -%}
+                {%- endfor -%}
+                <a href="{{ subitem.url }}" class="service-link stretched-link">
+                  <span>En plus</span>
+                  <i class="bi bi-arrow-right"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+
 {%- endfor -%}
+</div>
 </div>
 {%- endif -%}
 {%- endfor -%}
-</div>
+
+</section>

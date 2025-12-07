@@ -1,153 +1,49 @@
-<!DOCTYPE HTML>
-<!--
-	Landed by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
-<html>
-	{% include head.html %}
-	<body class="is-preload landing">
-		<div id="page-wrapper" class="container">
+---
+layout: default
+---
 
-			{% include top-header.html %}
 
-			<!-- Banner -->
-				<section id="">
-					<div class="container">
-						<header>
-                            <h2>{{ site.title }}</h2>
-                            <p>{{ site.description }}</p>
-                        </header>
-						<span class="image"><img src="images/pipe-37816.svg" alt="Outline image of a person playing trumpet" /></span>
-					</div>
-					<a href="#one" class="goto-next scrolly">On commence</a>
-				</section>
+    <!-- Hero Section -->
+    <section id="hero" class="hero section">
 
-			<!-- One -->
-				<section id="one" class="container">
-					<span class="image fit main"><img src="{{ site.baseurl }}/images/IMG_7137-1600.jpg" alt="" /></span>
-					<div class="content">
-						<div class="container">
-							<div class="row">
-								<div class="col-6 col-12-medium">
-									<header>
-										<h2>Vous y trouverez</h2>
-										<p>du matériel pour tous les niveaux</p>
-									</header>
-								</div>
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
 
-								<div class="col-6 col-12-medium">
-									<p>Vous y trouverez <a href="{{ site.baseurl }}/debutants">des plans de cours et des ressources pour les débutants</a>, <a href="{{ site.baseurl }}/accompagnements">des pistes d'accompagnement</a> pour les plus expérimentés, <a href="{{ site.baseurl }}/partitions">des partitions pour ensemble de cuivres</a> et <a href="{{ site.baseurl }}/les-pros">une liste de joueurs de cuivres professionnels</a>, dans de nombreux styles : classique, funk, jazz et orchestre de cuivres. </p>
-									<p>Merci à <a href="https://www.facebook.com/Meffecrea/" target="_blank">Meffe Photographies</a> pour la photo!</p>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!--<a href="#two" class="goto-next scrolly">Next</a>-->
-				</section>
+        <div class="row gy-4 align-items-center">
+          <div class="col-lg-6 order-2 order-lg-1">
+            <div class="hero-content">
+              <h1 data-aos="fade-up" data-aos-delay="200">Bonjour, je suis <span class="highlight">Mark Berthelemy</span></h1>
+              <h2 data-aos="fade-up" data-aos-delay="300"><span class="typed" data-typed-items="Musicien, Enseignant, Technologue"></span></h2>
+              <p data-aos="fade-up" data-aos-delay="400">Rejoignez-moi pour explorer le monde de la création musicale à travers les instruments acoustiques et la technologie.</p>
+              <div class="hero-actions" data-aos="fade-up" data-aos-delay="500">
+                <a href="/a-propos" class="btn btn-primary">À propos</a>
+                <a href="/contact" class="btn btn-outline">Contactez moi</a>
+              </div>
+              
+            </div>
+          </div>
+          <div class="col-lg-6 order-1 order-lg-2">
+            <div class="hero-image" data-aos="zoom-in" data-aos-delay="300">
+              <div class="image-wrapper">
+                <img src="/images/pipe-37816_1280.png" alt="Jouer de la trompette" class="img-fluid">
+                <div class="floating-elements">
+                  <div class="floating-card design" data-aos="fade-left" data-aos-delay="700">
+                    <i class="bi bi-music-note-beamed"></i>
+                    <span>Musique</span>
+                  </div>
+                  <div class="floating-card code" data-aos="fade-right" data-aos-delay="800">
+                    <i class="bi bi-people-fill"></i>
+                    <span>Enseignement</span>
+                  </div>
+                  <div class="floating-card creativity" data-aos="fade-up" data-aos-delay="900">
+                    <i class="bi bi-headphones"></i>
+                    <span>Technologie</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-			<!-- Two -->
-				<!--<section id="two" class="spotlight style2 right">
-					<span class="image fit main"><img src="images/pic03.jpg" alt="" /></span>
-					<div class="content">
-						<header>
-							<h2>Interdum amet non magna accumsan</h2>
-							<p>Nunc commodo accumsan eget id nisi eu col volutpat magna</p>
-						</header>
-						<p>Feugiat accumsan lorem eu ac lorem amet ac arcu phasellus tortor enim mi mi nisi praesent adipiscing. Integer mi sed nascetur cep aliquet augue varius tempus lobortis porttitor lorem et accumsan consequat adipiscing lorem.</p>
-						<ul class="actions">
-							<li><a href="#" class="button">Learn More</a></li>
-						</ul>
-					</div>
-					<a href="#three" class="goto-next scrolly">Next</a>
-				</section>-->
+      </div>
 
-			<!-- Three -->
-				<!--<section id="three" class="spotlight style3 left">
-					<span class="image fit main bottom"><img src="images/pic04.jpg" alt="" /></span>
-					<div class="content">
-						<header>
-							<h2>Interdum felis blandit praesent sed augue</h2>
-							<p>Accumsan integer ultricies aliquam vel massa sapien phasellus</p>
-						</header>
-						<p>Feugiat accumsan lorem eu ac lorem amet ac arcu phasellus tortor enim mi mi nisi praesent adipiscing. Integer mi sed nascetur cep aliquet augue varius tempus lobortis porttitor lorem et accumsan consequat adipiscing lorem.</p>
-						<ul class="actions">
-							<li><a href="#" class="button">Learn More</a></li>
-						</ul>
-					</div>
-					<a href="#four" class="goto-next scrolly">Next</a>
-				</section>-->
-
-			<!-- Four -->
-				<!--<section id="four" class="wrapper style1 special fade-up">
-					<div class="container">
-						<header class="major">
-							<h2>Accumsan sed tempus adipiscing blandit</h2>
-							<p>Iaculis ac volutpat vis non enim gravida nisi faucibus posuere arcu consequat</p>
-						</header>
-						<div class="box alt">
-							<div class="row gtr-uniform">
-								<section class="col-4 col-6-medium col-12-xsmall">
-									<span class="icon solid alt major fa-chart-area"></span>
-									<h3>Ipsum sed commodo</h3>
-									<p>Feugiat accumsan lorem eu ac lorem amet accumsan donec. Blandit orci porttitor.</p>
-								</section>
-								<section class="col-4 col-6-medium col-12-xsmall">
-									<span class="icon solid alt major fa-comment"></span>
-									<h3>Eleifend lorem ornare</h3>
-									<p>Feugiat accumsan lorem eu ac lorem amet accumsan donec. Blandit orci porttitor.</p>
-								</section>
-								<section class="col-4 col-6-medium col-12-xsmall">
-									<span class="icon solid alt major fa-flask"></span>
-									<h3>Cubilia cep lobortis</h3>
-									<p>Feugiat accumsan lorem eu ac lorem amet accumsan donec. Blandit orci porttitor.</p>
-								</section>
-								<section class="col-4 col-6-medium col-12-xsmall">
-									<span class="icon solid alt major fa-paper-plane"></span>
-									<h3>Non semper interdum</h3>
-									<p>Feugiat accumsan lorem eu ac lorem amet accumsan donec. Blandit orci porttitor.</p>
-								</section>
-								<section class="col-4 col-6-medium col-12-xsmall">
-									<span class="icon solid alt major fa-file"></span>
-									<h3>Odio laoreet accumsan</h3>
-									<p>Feugiat accumsan lorem eu ac lorem amet accumsan donec. Blandit orci porttitor.</p>
-								</section>
-								<section class="col-4 col-6-medium col-12-xsmall">
-									<span class="icon solid alt major fa-lock"></span>
-									<h3>Massa arcu accumsan</h3>
-									<p>Feugiat accumsan lorem eu ac lorem amet accumsan donec. Blandit orci porttitor.</p>
-								</section>
-							</div>
-						</div>
-						<footer class="major">
-							<ul class="actions special">
-								<li><a href="#" class="button">Magna sed feugiat</a></li>
-							</ul>
-						</footer>
-					</div>
-				</section>-->
-
-			<!-- Five -->
-				<!--<section id="five" class="wrapper style2 special fade">
-					<div class="container">
-						<header>
-							<h2>Magna faucibus lorem diam</h2>
-							<p>Ante metus praesent faucibus ante integer id accumsan eleifend</p>
-						</header>
-						<form method="post" action="#" class="cta">
-							<div class="row gtr-uniform gtr-50">
-								<div class="col-8 col-12-xsmall"><input type="email" name="email" id="email" placeholder="Your Email Address" /></div>
-								<div class="col-4 col-12-xsmall"><input type="submit" value="Get Started" class="fit primary" /></div>
-							</div>
-						</form>
-					</div>
-				</section>-->
-
-			{% include footer.html %}
-
-		</div>
-
-		{% include scripts.html %}
-
-	</body>
-</html>
+    </section><!-- /Hero Section -->

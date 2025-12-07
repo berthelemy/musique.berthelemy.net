@@ -2,76 +2,60 @@
 title: Playlists
 permalink: /cuivres/playlists
 description: Des vidéos et des enregistrements à écouter, à apprécier et avec lesquels jouer.
-layout: no-sidebar
+layout: generic
 image: 
 image-alt: 
 ---
 
-<h2>Audio</h2>
-
-<h3>Trombone swing in F</h3>
-<p>Composer: Mark Berthelemy</p>
-<audio controls>
-    <source src="{{ site.baseurl }}assets/audio/trombone_swing_in_F.mp4" type="audio/mp4">
-</audio>
-
-<p><a class="button" href="{{ site.baseurl }}assets/audio/trombone_swing_in_F.pdf" target="_blank">Download chord chart</a></p>
-
-<h3>Berceuse Cossaque</h3>
-<p>Étude d'improvisation</p>
-<p>Traditional, arrangé par Mark Berthelemy</p>
-<audio controls>
-    <source src="{{ site.baseurl }}assets/audio/Berceuse_Cossaque.mp3" type="audio/mp3">
-</audio>
-<p><a class="button" href="{{ site.baseurl }}assets/audio/Berceuse_Cossaque_score.pdf" target="_blank">Download full score (pdf)</a></p>
-<h2>Sur Youtube</h2>
-
-{%- assign accs = site.accompagnements | group_by: "difficulty" -%}
+<section id="portfolio" class="portfolio section">
 
 
-{%- for accompagnement in accs -%}
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
 
-<h3>{{ accompagnement.name | capitalize }}</h3>
+        <div class="isotope-layout" data-default-filter="*" data-layout="masonry" data-sort="original-order">
+          <ul class="portfolio-filters isotope-filters" data-aos="fade-up" data-aos-delay="200">
 
-{%- assign count = 1 -%}
-{%- assign length = accompagnement.items | size -%}
+            {% assign categories_grouped = site.accompagnements | group_by: "difficulty" %}
+            <li data-filter="*" class="filter-active">Tous</li>
+            {%- for cat in categories_grouped -%}
+            <li data-filter=".filter-{{ cat.name }}">{{ cat.name | capitalize }}</li>
+            {%- endfor -%}
+          </ul><!-- End Portfolio Filters -->
 
-{%- for item in accompagnement.items -%}
-{%- if item.youtube -%}
-    {%- assign link-array = item.youtube | split: "/" -%}
-    {%- assign youtube-id = link-array[3] -%}
-    {%- assign youtube-id-array = youtube-id | split: "?" -%}
-    {%- assign youtube-id = youtube-id-array[0] -%}
-    {%- assign thumbnail-link = youtube-id | prepend: "https://img.youtube.com/vi/" | append: "/mqdefault.jpg" -%}
-{%- endif -%}
+          <div class="row gy-4 isotope-container" data-aos="fade-up" data-aos-delay="300">
 
-{%- assign mod = count | modulo: 2 -%}
-{%- if mod != 0 -%}<div class="row">{%- endif -%}
-<div class="col-6 col-12-medium">
-    <img src="{{ thumbnail-link }}" alt="Youtube thumbnail" style="width: 33%; float:left; margin-right: 1rem;"/>
-    <h3><a href="{{ item.url | relative_url }}">{{ item.title }}</a></h3>
-    <p>Tonalité: {{ item.key }}</p>
-    <!--<p>length: {{ length }}, count: {{ count }}</p>-->
-</div>
+            {%- for acc in site.accompagnements -%}
+            <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-{{ acc.difficulty }}">
+              <div class="portfolio-card">
+               
+                <div class="portfolio-info">
+                  <h4>{{ acc.title }}</h4>
+                  <p>{{ acc.key }}</p>
+                  <div class="ratio ratio-16x9" style="max-width: 560px;">
+        <iframe
+        id="player-{{ acc.title | slugify }}" class="youtube-player" src="{{ acc.youtube | replace: 'watch?v=', 'embed/' }}?enablejsapi=1" 
+        frameborder="0"
+        allowfullscreen>
+    </iframe>
+        
+        </div>
+                  <div class="portfolio-tags my-3">
+                    <span>{{ acc.type }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {%- endfor -%}
 
-{%- assign mod = count | modulo: 2 -%}
-{%- if count == length -%}
-    </div><!-- end of section -->
-    {%- assign count = 1 -%}
-{%- elsif mod == 0 %}
-    </div>
-{%- endif -%}
+            
+          </div><!-- End Portfolio Items Container -->
 
-{%- assign count = count | plus: 1 -%}
+        </div>
 
+        <div class="text-center mt-5" data-aos="fade-up" data-aos-delay="400">
+          <a href="#portfolio" class="btn btn-primary">View All Case Studies</a>
+        </div>
 
+      </div>
 
-{%- endfor -%}
-{%- if count == 1 %}</div>{% endif -%}
-{%- endfor -%}
-
-<p>Cette liste de lecture Youtube contient de nombreux solistes et ensembles, jouant différents types de musique.</p>
-<p>Écoutez et laissez-vous inspirer !</p>
-<div class="video-container">
-<iframe src="https://www.youtube.com/embed/videoseries?si=ZYQdVPu-xAHhKEwp&amp;list=PLGl-Md0RRaUGL4yCZvZCCURL12bv1pDde" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-</div>
+    </section>

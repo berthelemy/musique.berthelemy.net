@@ -1,0 +1,13 @@
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<script src="{{ '/assets/js/jquery.min.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/jquery.scrolly.min.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/jquery.dropotron.min.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/jquery.scrollex.min.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/browser.min.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/breakpoints.min.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/util.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/main.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/glossary-data.js' | relative_url }}"></script>
+
+<script src="https://kit.fontawesome.com/22cfb82c4b.js" crossorigin="anonymous"></script>

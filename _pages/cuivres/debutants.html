@@ -1,32 +1,42 @@
 ---
-title: Leçons et ressources pour les débutants
+title: Les débutants
 permalink: /cuivres/debutants
 description: Des leçons, des conseils et un accompagnement pour vous aider à débuter avec votre instrument.
-layout: no-sidebar
+layout: generic
 image: 
 image-alt: 
 ---
-<h3>Leçons</h3>
 
-<table>
-    <thead>
-        <th>Leçon</th>
-        <th>Objectifs</th>
-    </thead>
-    <tbody>
-        {%- for lecon in site.data.lecons -%}
-        <tr>
-            <td><p>{{ lecon.number }}</p></td>
-            <td>
-                <ul>
+
+  <div class="row g-5">
+{%- for lecon in site.data.lecons -%}
+<div class="col-md-6">
+<div class="card h-100">
+  <div class="card-header">
+    <h5 class="card-title">Leçon {{ lecon.number }} - {{ lecon.youtube-name }}</h5>
+  </div>
+  <div class="card-body d-flex justify-content-center">
+    
+    <div class="ratio ratio-16x9" style="max-width: 560px;">
+        <iframe
+        id="player-{{ lecon.number }}" class="youtube-player" src="{{ lecon.youtube | replace: 'watch?v=', 'embed/' }}?enablejsapi=1" 
+        frameborder="0"
+        allowfullscreen>
+    </iframe>
+        
+        </div>
+  </div>
+  <div class="card-footer">
+    <ul>
                     {%- for objectif in lecon.objectifs -%}
                     <li>{{ objectif }}</li>
                     {%- endfor -%}
                 </ul>
-                {%- if lecon.youtube -%}<h4>Leçon {{ lecon.number }} video</h4>
-                <p><a href="{{ lecon.youtube }}" target="_blank">{{ lecon.youtube-name }}</a>&nbsp;<i class="fas fa-external-link-alt"></i></p>{%- endif -%}
-            </td>
-        </tr>
-        {%- endfor -%}
-    </tbody>
-</table>
+    
+  
+
+  </div>
+</div>
+</div>
+{%- endfor -%}
+  </div>

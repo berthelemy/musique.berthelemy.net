@@ -1,5 +1,5 @@
 ---
-title: Téchnologie musicale
+title: Technologie musicale
 permalink: /technologie
 layout: section
 ---

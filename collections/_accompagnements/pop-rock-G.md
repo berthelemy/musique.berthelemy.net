@@ -1,10 +1,10 @@
 ---
-title: Pop rock
+title: Pop rock en sol
 key: Sol majeur (G)
 tagline: Jouer avec la piste d'accompagnement
 type: backing-track
 difficulty: facile
-youtube: https://youtu.be/gwoHnmcCuH4?si=R4lhRrM31-2BUvYI
+youtube: https://www.youtube.com/watch?v=gwoHnmcCuH4
 active: true
 ---
 

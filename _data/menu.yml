@@ -6,10 +6,13 @@ menuitems:
     subfolderitems:
       - page: Débutants
         url: /cuivres/debutants
+        icon: person-lines-fill
       - page: Playlists
         url: /cuivres/playlists
+        icon: view-list
   - title: Technologie musicale
     url: /technologie
     subfolderitems:
       - page: Comprendre le son
         url: /technologie/comprendre-le-son
+        icon: ear
