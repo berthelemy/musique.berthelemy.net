@@ -4,10 +4,9 @@ description: Que se passe-t-il lorsque vous choisir des notes differents ?
 ---
 
 
-<section>
-
-
-
+<div class="container">
+    <div class="row g-5">
+        <div class="col-lg-8">
     <canvas id="osc" width="1024" height="256" style="width:100%;max-width:1024px;border:1px solid #ccc;background:#111;"></canvas>
 
     <p id="status">Appuyez sur une touche du piano et observez le changement de fréquence.</p>
@@ -16,14 +15,14 @@ description: Que se passe-t-il lorsque vous choisir des notes differents ?
         
         <div id="pianoContainer" style="display:flex;gap:2px;margin-top:8px;overflow-x:auto;padding:8px;background:#222;border-radius:4px;"></div>
     </div>
-</section>
+</div>
 
-<section>
-    <h2>Activités</h2>
+<div class="col-lg-4">
+    <h2>Questions</h2>
     <p>Que remarquez-vous concernant la fréquence lorsque vous jouez des notes plus graves et plus aiguës ?</p>
     <p>Appuyez sur la touche La au milieu du clavier. Quelle est sa fréquence ? Appuyez maintenant sur la touche La aiguë. Quelle est sa fréquence ? Essayez maintenant la touche La grave. Que remarquez-vous concernant les fréquences ?</p>
     <p>Que remarquez-vous concernant la distance entre chaque pic sur la forme d'onde ?</p>
-</section>
+</div>
 
 <script>
 (() => {

@@ -1,25 +1,25 @@
 ---
 title: Visualizer vos sons
-description: Observez les formes de vos propres sons.
+description: Observez les formes de vos propres sons
 ---
-
-
-<section>
+<div class="container">
+    <div class="row g-5">
+        <div class="col-lg-8">
     <p>Essayez différents sons pour voir ce qui se passe. Est-ce que vous pouvez répondre aux questions ci-dessous?</p>
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
-        <a id="startBtn" class="button primary">Démarrer</a>
-        <a id="holdBtn" class="button" style="margin-left:8px;">Tenez</a>
-        <a id="stopBtn" disabled class="button">Stop</a>
+        <a id="startBtn" class="btn btn-primary">Démarrer</a>
+        <a id="holdBtn" class="btn btn-secondary" style="margin-left:8px;">Tenez</a>
+        <a id="stopBtn" disabled class="btn btn-secondary">Stop</a>
     </div>
     <p id="status">Cliquez sur « Démarrer » pour autoriser l'accès au microphone et visualiser la forme d'onde.</p>
     <canvas id="osc" width="1024" height="256" style="width:100%;max-width:1024px;border:1px solid #ccc;background:#111;"></canvas>
-</section>
-<section>
-    <h2>Activités</h2>
+</div>
+<div class="col-lg-4">
+    <h2>Questions</h2>
     <p>Essayez de chanter, de siffler ou de jouer d'un instrument. Alternez entre notes aiguës et graves. Que se passe-t-il avec l'image ?</p>
     <p>Trouvez un objet qui sonne quand vous le frappez. Comment l'image change-t-elle ?</p>
     <p>Maintenant, frappez quelque chose qui ne sonne pas. Comment l'image change-t-elle ?</p>
-</section>
+</div>
 
 <script>
 (() => {

@@ -4,13 +4,15 @@ description: Découvrez ce que nous entendons par ces mots.
 ---
 
 
-<section>
+<div class="container">
+    <div class="row g-5">
+        <div class="col-lg-8">
     <p id="status">Génère une sinusoïde et affiche la forme d'onde. Est-ce que vous pouvez répondre aux questions ci-dessous?</p>
     <p>Utilisez les curseurs pour ajuster la fréquence et l'amplitude, puis cliquez sur Démarrer.</p>
 
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px;">
-        <a id="startBtn" class="button primary">Démarrer</a>
-        <a id="stopBtn" disabled class="button">Stop</a>
+        <a id="startBtn" class="btn btn-primary">Démarrer</a>
+        <a id="stopBtn" disabled class="btn btn-secondary">Stop</a>
     </div>
     <div>
         <label style="display:flex;align-items:center;gap:8px;">
@@ -27,14 +29,14 @@ description: Découvrez ce que nous entendons par ces mots.
     </div>
 
     <canvas id="osc" width="1024" height="256" style="width:100%;max-width:1024px;border:1px solid #ccc;background:#111;"></canvas>
-</section>
+</div>
 
-<section>
-    <h2>Activités</h2>
+<div class="col-lg-4">
+    <h2>Questions</h2>
     <p>Que se passe-t-il lorsqu'on change la fréquence ? Que devient le son ? Que devient l'image ?</p>
     <p>Le hertz (Hz) correspond au nombre de vibrations par seconde. On appelle cela la « fréquence ». Quelle est la fréquence la plus basse que vous puissiez entendre ?</p>
     <p>Que se passe-t-il lorsque vous modifiez l'amplitude ? Que devient le son ? Que devient l'image ?</p>
-</section>
+</div>
 
 <script>
 (() => {
