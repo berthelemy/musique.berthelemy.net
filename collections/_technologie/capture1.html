@@ -1,0 +1,312 @@
+---
+title: Amplitude et distance
+description: Visualiser comment l'amplitude change en fonction de la distance
+active: true
+category: capture
+---
+
+<div class="container">
+  <div class="row g-3">
+    <div class="col-lg-8">
+      <canvas id="scene" width="1024" height="320" style="width:100%;max-width:1024px;border:1px solid #ccc;background:#111;"></canvas>
+        <div class="container">
+            <div class="row g-1">
+                <p>Déplacez le micro pour voir la réduction d'amplitude et le changement sur la forme d'onde.</p>
+                <div class="col-md-6">
+                    <p><strong>Distance (m) entre source et micro</strong></p>
+                    <p><input id="dist" type="range" min="0.2" max="3" step="0.01" value="1"> </p>
+                    <p id="distVal">Distance: 1.00 m</p>
+                    <p id="ampText">Amplitude: —  (— dB)</p>
+                </div>
+                <div class="col-md-6">
+                    <button id="startBtn" class="btn btn-secondary">Démarre</button>
+                    <button id="stopBtn" class="btn btn-secondary" disabled>Stop</button>
+                </div>
+                
+                
+            </div>
+        </div>
+      
+    </div>
+
+    <div class="col-lg-4">
+      <h2>Questions</h2>
+      <p>Quel est le meilleur endroit pour placer ce microphone afin de capter le maximum de son ?</p>
+      <p>Placez le microphone de manière à ce que l'amplitude soit de 1. À quelle distance l'amplitude chute-t-elle à environs 0,5 ?</p>
+      <p>À quelle distance l'amplitude chute-t-elle à environs 0,25 ?</p>
+      <p>Pouvez-vous tracer un graphique montrant la distance sur l'axe des x et l'amplitude sur l'axe des y ? Que vous apprend cela sur le son lorsque le microphone s'éloigne de la source ?</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  // Elements
+  const canvas = document.getElementById('scene');
+  const ctx = canvas.getContext('2d');
+  const distSlider = document.getElementById('dist');
+  const distVal = document.getElementById('distVal');
+  const ampText = document.getElementById('ampText');
+  const startBtn = document.getElementById('startBtn');
+  const stopBtn = document.getElementById('stopBtn');
+
+  // Audio / simulation constants
+  const SOURCE_AMPLITUDE = 1.0;    // arbitrary source amplitude
+  const MIN_DIST = 0.2;            // avoid division by zero (meters)
+  const MAX_VISUAL_AMP = 1.0;      // clamp for display
+  const OSC_FREQ = 440;            // source frequency (Hz)
+  const AUDIO_GAIN_MAX = 0.4;      // maximum audible gain (keeps volume safe)
+
+  // WebAudio nodes (created on first user gesture)
+  let audioCtx = null;
+  let osc = null;
+  let gain = null;
+  let analyser = null;
+  let dataArray = null;
+
+  // Resize canvas for device pixel ratio
+  function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    const w = canvas.clientWidth * dpr;
+    const h = canvas.clientHeight * dpr;
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w;
+      canvas.height = h;
+    }
+  }
+
+  // Map distance (meters) to normalized amplitude 0..1 using inverse-square:
+  // normalized = (minDist / dist)^2  (clamped to 1)
+  function amplitudeFromDistance(d) {
+    const safeD = Math.max(d, MIN_DIST);
+    const norm = Math.min(1, (MIN_DIST * MIN_DIST) / (safeD * safeD));
+    return norm;
+  }
+
+  // Convert linear amplitude (0..1) to dB (approx)
+  function ampToDb(a) {
+    if (a <= 0) return -Infinity;
+    return 20 * Math.log10(a);
+  }
+
+  // Draw speaker, microphone, distance line and small waveform at mic position
+  function drawScene() {
+    resize();
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // background
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, W, H);
+
+    // layout: speaker at left (10% padding), mic position depends on slider
+    const pad = 0.08 * W;
+    const speakerX = pad;
+    const micX = pad + (W - 2 * pad) * ((Number(distSlider.value) - Number(distSlider.min)) / (Number(distSlider.max) - Number(distSlider.min)));
+    const centerY = H / 2;
+
+    // draw speaker icon (simple cone)
+    ctx.fillStyle = '#ddd';
+    ctx.beginPath();
+    ctx.moveTo(speakerX - 6, centerY - 24);
+    ctx.lineTo(speakerX + 30, centerY - 40);
+    ctx.lineTo(speakerX + 30, centerY + 40);
+    ctx.lineTo(speakerX - 6, centerY + 24);
+    ctx.closePath();
+    ctx.fill();
+
+    // small circle for speaker
+    //ctx.fillStyle = '#999';
+    //ctx.beginPath();
+    //ctx.arc(speakerX + 44, centerY, 18, 0, Math.PI * 2);
+    //ctx.fill();
+
+    // label the speaker
+    ctx.fillStyle = '#ddd';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    const fontSize = Math.max(10, Math.round(12 * (window.devicePixelRatio || 1)));
+    ctx.font = `${fontSize}px sans-serif`;
+    ctx.fillText('Source', speakerX + 30, centerY + 46);
+    ctx.fillText('sonore', speakerX + 30, centerY + 70);
+
+    // compute normalized amplitude and dB
+    const dist = Number(distSlider.value);
+    const normAmp = amplitudeFromDistance(dist);           // 0..1
+    const db = ampToDb(normAmp);
+
+    // draw amplitude bar
+    /*
+    const barW = 140, barH = 12;
+    const barX = W - barW - 24, barY = 16;
+    ctx.fillStyle = '#222';
+    ctx.fillRect(barX, barY, barW, barH);
+    ctx.fillStyle = '#0f0';
+    ctx.fillRect(barX, barY, Math.round(normAmp * barW), barH);
+    ctx.strokeStyle = '#444';
+    ctx.strokeRect(barX, barY, barW, barH);
+    */
+    // label
+    /*
+    ctx.fillStyle = '#ddd';
+    ctx.font = `${12 * (window.devicePixelRatio || 1)}px sans-serif`;
+    ctx.fillText(`Distance: ${dist.toFixed(2)} m`, barX, barY + barH + 14);
+    ctx.fillText(`Amp: ${normAmp.toFixed(2)} (${isFinite(db) ? db.toFixed(1) + ' dB' : '-∞ dB'})`, barX, barY + barH + 28);
+    */
+    // draw small waveform at mic location (animated using analyser if audio running, otherwise synthetic)
+    // make waveform larger and responsive to canvas height
+    const waveW = Math.min(320, Math.round(W * 0.45));    // cap width for layout
+    const waveH = Math.round(H * 0.6);                    // 60% of canvas height for better visibility
+    const waveX = Math.max(speakerX + 80, micX - waveW / 2);
+    const waveY = centerY - waveH / 2;
+
+    // background box
+    ctx.fillStyle = '#111';
+    ctx.fillRect(waveX, waveY, waveW, waveH);
+    ctx.strokeStyle = '#333';
+    ctx.strokeRect(waveX, waveY, waveW, waveH);
+
+    // get waveform data: if analyser exists read it, else synth sample
+    const samples = 512;
+    const samp = new Float32Array(samples);
+    if (analyser && dataArray) {
+      analyser.getFloatTimeDomainData(dataArray);
+      // copy scaled to samp
+      for (let i = 0; i < Math.min(samples, dataArray.length); i++) samp[i] = dataArray[i];
+    } else {
+      // synth a short sine buffer scaled by normAmp for display (static phase)
+      for (let i = 0; i < samples; i++) {
+        const t = i / samples;
+        samp[i] = Math.sin(2 * Math.PI * t * (OSC_FREQ / 2000)) * normAmp;
+      }
+    }
+
+    // draw waveform line within box
+    ctx.beginPath();
+    const step = waveW / samples;
+    for (let i = 0; i < samples; i++) {
+      const x = waveX + i * step;
+      const y = waveY + waveH / 2 - samp[i] * (waveH / 2);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = '#0cf';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // --- draw microphone last so it appears in the foreground ---
+    // draw microphone icon (foreground)
+    ctx.fillStyle = '#fdca00';
+    ctx.beginPath();
+    ctx.rect(micX - 10, centerY - 28, 20, 40);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(micX, centerY + 18, 12, 0, Math.PI);
+    ctx.fill();
+    // microphone outline for visibility
+    ctx.strokeStyle = '#666';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.rect(micX - 10, centerY - 28, 20, 40);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(micX, centerY + 18, 12, 0, Math.PI);
+    ctx.stroke();
+
+    // draw label for microphone
+    ctx.fillStyle = '#ddd';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.font = `${fontSize}px sans-serif`;
+    ctx.fillText('Micro', micX, centerY + 40);
+
+    // draw connecting line on top of waveform so mic is clearly visible
+    ctx.strokeStyle = '#888';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(speakerX + 60, centerY);
+    ctx.lineTo(micX - 20, centerY);
+    ctx.stroke();
+
+    // update status text outside canvas
+    ampText.textContent = `Amplitude à micro: ${normAmp.toFixed(2)}  (${isFinite(db) ? db.toFixed(1) + ' dB' : '-∞ dB'})`;
+  }
+
+  // Start WebAudio oscillator, connect to gain and analyser
+  async function startAudio() {
+    if (audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    osc = audioCtx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = OSC_FREQ;
+
+    gain = audioCtx.createGain();
+    gain.gain.value = 0;
+
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 2048;
+    dataArray = new Float32Array(analyser.fftSize);
+
+    osc.connect(gain);
+    gain.connect(analyser);
+    analyser.connect(audioCtx.destination);
+
+    osc.start();
+    if (audioCtx.state === 'suspended') await audioCtx.resume();
+  }
+
+  // Stop and release audio
+  function stopAudio() {
+    try { if (osc) { osc.stop(); osc.disconnect(); } } catch (e) {}
+    try { if (gain) gain.disconnect(); } catch (e) {}
+    try { if (analyser) analyser.disconnect(); } catch (e) {}
+    // do not close audioCtx to allow reuse; if needed call audioCtx.close()
+    audioCtx = null;
+    osc = gain = analyser = null;
+    dataArray = null;
+  }
+
+  // Update audio gain according to distance
+  function updateAudioGain() {
+    if (!gain || !audioCtx) return;
+    const normAmp = amplitudeFromDistance(Number(distSlider.value));
+    const target = normAmp * AUDIO_GAIN_MAX;
+    // smooth ramp to avoid clicks
+    gain.gain.cancelScheduledValues(audioCtx.currentTime);
+    gain.gain.setTargetAtTime(target, audioCtx.currentTime, 0.02);
+  }
+
+  // UI handlers
+  distSlider.addEventListener('input', () => {
+    distVal.textContent = 'Distance: ' + Number(distSlider.value).toFixed(2) + ' m';
+    updateAudioGain();
+    drawScene();
+  });
+
+  startBtn.addEventListener('click', async () => {
+    await startAudio();                // requires user gesture
+    updateAudioGain();
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
+  });
+
+  stopBtn.addEventListener('click', () => {
+    // fade out then stop audio
+    if (gain && audioCtx) gain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.02);
+    stopAudio();
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+  });
+
+  // initial draw
+  distVal.textContent = 'Distance: ' + Number(distSlider.value).toFixed(2) + ' m';
+  drawScene();
+
+  // animate to update waveform when audio is playing
+  function loop() {
+    drawScene();
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>

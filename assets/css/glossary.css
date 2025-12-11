@@ -1,7 +1,7 @@
 /* Style for the automatically linked term */
         .glossary-term {
             /* Makes the linked word visually distinct and suggests interactivity */
-            border-bottom: 2px dotted #007bff;
+            border-bottom: 2px dotted var(--accent-color);
             cursor: help;
             position: relative; 
             font-weight: bold;

@@ -59,7 +59,7 @@ defaults:
       path: ""
       type: "technologie"
     values:
-      layout: "generic"
+      layout: "technologie"
       sidebar: "technologie"
   - scope:
       path: ""

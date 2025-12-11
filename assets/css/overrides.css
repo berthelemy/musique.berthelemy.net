@@ -10,6 +10,7 @@
 
 .btn-primary:hover {
   background-color: color-mix(in srgb, var(--accent-color), #000 10%);
+  color: var(--contrast-color);
   border-color: color-mix(in srgb, var(--accent-color), #000 10%);
   transform: translateY(-3px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
@@ -27,3 +28,14 @@
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
+.contact .info-box h3, .contact .info-item .content h4 {
+    color: var(--heading-color);
+}
+
+.contact .info-item .icon-box i, .contact .info-box a {
+    color: var(--default-color);
+}
+
+.contact .contact-form .btn {
+    background-color: var(--accent-color);
+}

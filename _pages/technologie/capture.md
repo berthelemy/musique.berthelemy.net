@@ -1,9 +1,9 @@
 ---
 layout: generic
-title: Comprendre le son
-permalink: /technologie/comprendre-le-son
-description: Découvrez la nature du son et comment il peut se transformer en musique.
-category: comprendre
+title: Capture du son
+permalink: /technologie/capture-du-son
+description: Découvrez les techniques pour capturer un son prêt pour la musique en direct ou enregistrée
+category: capture
 ---
 
 
@@ -14,7 +14,7 @@ category: comprendre
         <div class="col-md-6" data-aos="fade-right" data-aos-delay="100">
             <div class="service-item">
               <div class="service-icon">
-                <i class="bi bi-soundwave"></i>
+                <i class="bi bi-mic-fill"></i>
               </div>
               <div class="service-content">
                 <h3>{{ item.title}}</h3>

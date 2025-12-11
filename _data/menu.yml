@@ -15,4 +15,9 @@ menuitems:
     subfolderitems:
       - page: Comprendre le son
         url: /technologie/comprendre-le-son
-        icon: ear
+        icon: soundwave
+      - page: Capture le son
+        url: /technologie/capture-du-son
+        icon: mic-fill
+  - title: Contact
+    url: /contact

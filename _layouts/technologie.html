@@ -1,0 +1,19 @@
+---
+layout: generic
+---
+
+{{ content }}
+
+<div class="d-flex justify-content-between">
+  {% if page.previous and page.previous.active == true %}
+    <a href="{{ page.previous.url }}" class=""><i class="bi bi-arrow-left-square-fill"></i> Précédement: {{ page.previous.title }}</a>
+  {% endif %}
+  
+  {% if page.next and page.next.active == true %}
+    <a href="{{ page.next.url }}" class="">Prochaine: {{ page.next.title }} <i class="bi bi-arrow-right-square-fill"></i></a>
+  {% endif %}
+</div>
+
+
+
+        
