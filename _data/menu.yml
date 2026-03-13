@@ -19,5 +19,8 @@ menuitems:
       - page: Capture le son
         url: /technologie/capture-du-son
         icon: mic-fill
+      - page: Spectacle en direct
+        url: /technologie/en-direct
+        icon: music-note-beamed
   - title: Contact
     url: /contact
