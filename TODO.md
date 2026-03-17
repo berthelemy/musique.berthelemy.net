@@ -1,3 +1,3 @@
 - Add menu description to page metadata
-- Change underlying CSS to Bootstrap
 - Use cards
+- Add defined images to technology collection
