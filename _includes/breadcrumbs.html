@@ -1,0 +1,28 @@
+{%- if page.url != "/" -%}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ "/" | relative_url }}">Acceuil</a></li>
+
+    {% assign paths = page.url | split: "/" %}
+    {% assign accumulated_path = "" %}
+
+    {% for part in paths %}
+      {% unless forloop.first %}
+        {% assign accumulated_path = accumulated_path | append: "/" | append: part %}
+        
+        {% if forloop.last %}
+          <li class="breadcrumb-item active" aria-current="page">
+            {{ page.title | default: part | replace: "-", " " | capitalize }}
+          </li>
+        {% else %}
+          <li class="breadcrumb-item">
+            <a href="{{ accumulated_path | relative_url }}">
+              {{ part | replace: "-", " " | capitalize }}
+            </a>
+          </li>
+        {% endif %}
+      {% endunless %}
+    {% endfor %}
+  </ol>
+</nav>
+{%- endif -%}

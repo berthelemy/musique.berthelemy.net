@@ -1,3 +1,11 @@
+.breadcrumb {
+  --bs-breadcrumb-item-active-color: var(--bs-primary-color);
+}
+
+.breadcrumb-item+.breadcrumb-item::before {
+  color: var(--bs-primary-color);
+}
+
 .btn-primary {
   background-color: var(--accent-color);
   border-color: var(--accent-color);
