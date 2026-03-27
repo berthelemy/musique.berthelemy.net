@@ -47,3 +47,7 @@
 .contact .contact-form .btn {
     background-color: var(--accent-color);
 }
+
+.hero .hero-content h1 .highlight::after {
+  background: none;
+}
