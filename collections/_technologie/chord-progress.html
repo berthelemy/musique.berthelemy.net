@@ -1,0 +1,880 @@
+---
+title: Chord progression
+description: Pour essayer de comprendre la progression d'accords, il est utile de visualiser les relations entre les accords.
+active: true
+category: harmonie
+permalink: /technologie/harmonie/chord-progress/
+---
+
+
+<style>
+    :root {
+      color-scheme: dark;
+      --bg: #101411;
+      --panel: #191f1b;
+      --panel-2: #202822;
+      --line: #344238;
+      --text: #f2f5f1;
+      --muted: #a7b3a9;
+      --accent: #b9f36b;
+      --accent-ink: #17210e;
+      --warning: #ffce8a;
+      --radius: 22px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 15% 0%, rgba(108, 157, 76, .13), transparent 38rem),
+        var(--bg);
+      color: var(--text);
+    }
+    button, input, select { font: inherit; }
+    button, select, input[type="number"] {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #151b17;
+      color: var(--text);
+      min-height: 44px;
+    }
+    button { cursor: pointer; padding: .7rem 1rem; font-weight: 650; transition: transform .12s ease, border-color .12s ease, background .12s ease; }
+    button:hover { border-color: #71866f; }
+    button:active { transform: scale(.985); }
+    button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+    button.primary:hover { background: #cdf994; }
+    button.secondary { background: var(--panel-2); }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    .shell { width: min(1120px, 100% - 32px); margin: 0 auto; padding: 0px 0 0px; }
+    header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 28px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 14px; background: var(--accent); color: var(--accent-ink); font-size: 1.3rem; font-weight: 900; }
+    .brand h1 { font-size: 1.05rem; letter-spacing: -.03em; margin: 0; }
+    .brand p { color: var(--muted); margin: 3px 0 0; font-size: .82rem; }
+    .live-pill { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); color: var(--muted); padding: 8px 11px; border-radius: 99px; font-size: .8rem; white-space: nowrap; }
+    .dot { width: 7px; height: 7px; background: #78867b; border-radius: 50%; }
+    .live-pill.running .dot { background: var(--accent); box-shadow: 0 0 0 4px rgba(185,243,107,.12); }
+    .intro { margin-bottom: 5px; }
+    .eyebrow { text-transform: uppercase; color: var(--accent); letter-spacing: .14em; font-size: .72rem; font-weight: 800; margin: 0 0 0px; }
+    .intro h2 { font-size: clamp(1.8rem, 5vw, 3rem); letter-spacing: -.055em; line-height: 1.04; margin: 0; max-width: 740px; }
+    .intro p { color: var(--muted); max-width: 640px; line-height: 1.6; margin: 0px 0 0; }
+    .chords { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .chord-card { position: relative; overflow: hidden; min-height: 258px; border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(20px, 4vw, 32px); background: linear-gradient(145deg, #1b241d, #171d19 72%); }
+    .chord-card.next { background: linear-gradient(145deg, #222b24, #191f1b 72%); }
+    .chord-card.current { border-color: #657e50; }
+    .card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .card-label { color: var(--muted); text-transform: uppercase; letter-spacing: .12em; font-size: .72rem; font-weight: 800; }
+    .tag { color: var(--accent); border: 1px solid #465c38; border-radius: 99px; padding: 5px 9px; font-size: .72rem; }
+    .chord-name { font-size: clamp(3.4rem, 9vw, 6.3rem); letter-spacing: -.08em; font-weight: 780; line-height: 1; margin: 34px 0 12px; overflow-wrap: anywhere; }
+    .next .chord-name { color: #dce6d9; }
+    .chord-meta { color: var(--muted); font-size: .93rem; }
+    .card-bottom { position: absolute; bottom: 20px; left: clamp(20px, 4vw, 32px); right: clamp(20px, 4vw, 32px); display: flex; justify-content: space-between; gap: 10px; align-items: center; color: var(--muted); font-size: .8rem; }
+    .progress-track { height: 4px; border-radius: 99px; background: #344036; overflow: hidden; margin-top: 12px; }
+    .progress-fill { width: 0%; height: 100%; background: var(--accent); transition: width .06s linear; }
+    .beat-row { display: flex; gap: 7px; margin: 18px 0 0; }
+    .beat { flex: 1; height: 7px; border-radius: 99px; background: #303a32; }
+    .beat.active { background: var(--accent); box-shadow: 0 0 12px rgba(185,243,107,.2); }
+    .beat.downbeat.active { background: #fff; }
+    .workspace { display: grid; grid-template-columns: 1.1fr .9fr; gap: 14px; margin-top: 14px; align-items: start; }
+    .panel { border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; background: rgba(25,31,27,.9); }
+    .panel h3 { margin: 0 0 18px; font-size: 1rem; letter-spacing: -.02em; }
+    .settings-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; }
+    .field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+    .field label { font-size: .79rem; color: var(--muted); font-weight: 650; }
+    .field select, .field input { width: 100%; padding: 0 12px; }
+    .meter-fields { display: grid; grid-template-columns: 1fr 16px 1fr; align-items: center; gap: 7px; }
+    .slash { text-align: center; color: var(--muted); }
+    .tempo-line { display: grid; grid-template-columns: minmax(0,1fr) 72px; gap: 8px; align-items: center; }
+    input[type="range"] { width: 100%; accent-color: var(--accent); }
+    .hint { color: var(--muted); font-size: .75rem; line-height: 1.45; margin: 8px 0 0; }
+    .metronome-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; margin-top: 17px; background: #151b17; }
+    .metronome-copy { display: flex; flex-direction: column; gap: 3px; }
+    .metronome-copy strong { font-size: .88rem; }
+    .metronome-copy span { color: var(--muted); font-size: .75rem; line-height: 1.4; }
+    .toggle { display: inline-flex; align-items: center; gap: 9px; cursor: pointer; white-space: nowrap; font-size: .82rem; font-weight: 700; }
+    .toggle input { width: 19px; height: 19px; accent-color: var(--accent); }
+    .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .controls button { flex: 1; min-width: 105px; }
+    .status-line { color: var(--muted); font-size: .82rem; margin-top: 13px; min-height: 1.2em; }
+    .sequence-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+    .sequence-head h3 { margin: 0; }
+    .small-button { min-height: 34px; padding: .45rem .7rem; font-size: .78rem; }
+
+    .graph-visual-wrap { position: relative; width: 100%; overflow: hidden; border: 1px solid #2c3a31; border-radius: 18px; background: radial-gradient(ellipse at center, #202b24 0%, #151b17 70%); margin: 0 0 16px; }
+    #chordMap { display: block; width: 100%; height: auto; min-height: 300px; }
+    .map-edge { stroke: #52675a; stroke-width: 1.35; opacity: .45; transition: stroke .3s, opacity .3s, stroke-width .3s; }
+    .map-edge.current-edge { stroke: #b9f36b; opacity: .95; stroke-width: 2.6; }
+    .map-edge.next-edge { stroke: #65d9ef; opacity: .95; stroke-width: 2.6; }
+    .map-node { cursor: default; }
+    .map-node circle { fill: #202b24; stroke: #64816c; stroke-width: 1.5; transition: fill .25s, stroke .25s, r .25s, filter .25s; }
+    .map-node text { fill: #dce8df; font: 600 13px Inter, ui-sans-serif, system-ui, sans-serif; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+    .map-node.current circle { fill: #b9f36b; stroke: #e1ffc0; stroke-width: 3; filter: drop-shadow(0 0 10px rgba(185,243,107,.65)); }
+    .map-node.current text { fill: #17210e; font-size: 17px; font-weight: 800; }
+    .map-node.next circle { fill: #1c6571; stroke: #79edff; stroke-width: 3; filter: drop-shadow(0 0 9px rgba(101,217,239,.55)); animation: nextPulse 1.3s ease-in-out infinite; }
+    .map-node.next text { fill: #f0fdff; font-size: 15px; font-weight: 800; }
+    .map-node.neighbor circle { stroke: #b9f36b; stroke-width: 2; }
+    .map-legend { display: flex; flex-wrap: wrap; gap: 14px; color: var(--muted); font-size: .78rem; padding: 0 14px 13px; }
+    .legend-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
+    .legend-current { background: #b9f36b; } .legend-next { background: #65d9ef; } .legend-linked { background: #64816c; }
+    @keyframes nextPulse { 0%,100% { r: 17px; } 50% { r: 20px; } }
+    .graph-list { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow: auto; padding-right: 2px; }
+    .graph-item { border: 1px solid #2f3b32; background: #171d19; padding: 11px 12px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .graph-item.active { border-color: #6d8c51; background: #202b20; }
+    .graph-item strong { font-size: .9rem; }
+    .graph-item span { color: var(--muted); font-size: .76rem; text-align: right; }
+    .graph-note { color: var(--muted); font-size: .78rem; line-height: 1.5; margin: 12px 0 0; }
+    .footer-note { text-align: center; color: #758177; font-size: .76rem; line-height: 1.5; margin: 24px 0 0; }
+    @media (max-width: 760px) {
+      .shell { width: min(100% - 22px, 600px); padding-top: 0px; }
+      header { margin-bottom: 24px; }
+      .chords, .workspace { grid-template-columns: 1fr; }
+      .chord-card { min-height: 218px; }
+      .chord-name { margin-top: 25px; font-size: clamp(3.5rem, 17vw, 5.2rem); }
+      .workspace { margin-top: 12px; }
+      .panel { padding: 18px; }
+    }
+    @media (max-width: 380px) {
+      .settings-grid { grid-template-columns: 1fr; }
+      .live-pill { font-size: .72rem; padding: 7px 8px; }
+      .brand p { display: none; }
+      .controls button { min-width: 90px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: .001ms !important; animation-duration: .001ms !important; }
+    }
+  </style>
+  <main class="shell">
+    
+
+    
+    <p class="slash">Choisissez un accord de départ, définissez la mesure et le tempo, puis laissez les accords associés se dévoiler au fil du temps.</p>
+    
+
+    <section class="chords" aria-label="Current and next chords">
+      <article class="chord-card current">
+        <div class="card-top"><span class="card-label">Accord actuel</span><span class="tag" id="barTag">Bar 1</span></div>
+        <div class="chord-name" id="currentChord">C</div>
+        <div class="chord-meta" id="currentMeta">C major triad</div>
+        <div class="card-bottom"><span id="currentPosition">Beat 1 of 4</span><span id="currentNotes">A · C · E · G</span></div>
+      </article>
+      <article class="chord-card next">
+        <div class="card-top"><span class="card-label">À venir</span><span class="tag" id="countdownTag">Ready</span></div>
+        <div class="chord-name" id="nextChord">Dm7</div>
+        <div class="chord-meta" id="nextMeta">D minor seventh</div>
+        <div class="card-bottom"><span id="nextTiming">Next change</span><span id="nextNotes">D · F · A · C</span></div>
+      </article>
+    </section>
+    <div class="progress-track" aria-label="Progress to next chord"><div id="progressFill" class="progress-fill"></div></div>
+    <div id="beatRow" class="beat-row" aria-label="Beat position"></div>
+
+    <section class="workspace">
+      <section class="panel" aria-labelledby="settingsTitle">
+        <h3 id="settingsTitle">Session settings</h3>
+        <div class="settings-grid">
+          <div class="field">
+            <label for="graphSelect">Chord graph</label>
+            <select id="graphSelect">
+              <option value="custom">My chord graph</option>
+              <option value="common">Common linked chords</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="startChord">Starting chord</label>
+            <select id="startChord"></select>
+          </div>
+          <div class="field">
+            <label for="changeEvery">Change chord every</label>
+            <select id="changeEvery">
+              <option value="0.25">Quarter beat (1/16 in 4/4)</option>
+              <option value="0.5">Half beat (eighth note in 4/4)</option>
+              <option value="1">1 beat</option>
+              <option value="2">2 beats</option>
+              <option value="bar" selected>1 bar</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Time signature</label>
+            <div class="meter-fields">
+              <select id="numerator" aria-label="Time signature numerator"></select>
+              <span class="slash">/</span>
+              <select id="denominator" aria-label="Time signature denominator">
+                <option value="2">2</option><option value="4" selected>4</option><option value="8">8</option><option value="16">16</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="tempoRange">Tempo (BPM)</label>
+            <div class="tempo-line">
+              <input id="tempoRange" type="range" min="30" max="240" value="80">
+              <input id="tempoNumber" type="number" min="30" max="240" value="80" aria-label="Tempo in beats per minute">
+            </div>
+          </div>
+        </div>
+        <p class="hint">BPM refers to the selected denominator note. In 6/8, for example, 80 BPM means 80 eighth-note beats per minute.</p>
+        <div class="metronome-row">
+          <div class="metronome-copy">
+            <strong>Audio metronome</strong>
+            <span>Quarter-note clicks on the selected beat unit, with a stronger bar downbeat.</span>
+          </div>
+          <label class="toggle" for="metronomeToggle">
+            <input id="metronomeToggle" type="checkbox" checked>
+            <span id="metronomeLabel">On</span>
+          </label>
+        </div>
+        <div class="controls">
+          <button id="startButton" class="primary">▶ Start</button>
+          <button id="pauseButton" class="secondary" disabled>Ⅱ Pause</button>
+          <button id="advanceButton" class="secondary">Next chord ↗</button>
+          <button id="resetButton" class="secondary">↺ Reset</button>
+        </div>
+        <div class="status-line" id="statusLine" role="status">Choose your settings, then press Start.</div>
+      </section>
+
+      <section class="panel" aria-labelledby="graphTitle">
+        <div class="sequence-head">
+          <h3 id="graphTitle">Chord connections</h3>
+          <button id="showGraphButton" class="secondary small-button" aria-expanded="true">Hide graph</button>
+        </div>
+        <div class="graph-visual-wrap" aria-label="Animated chord connection map">
+          <svg id="chordMap" viewBox="0 0 900 560" role="img" aria-label="Chord map with current chord in the centre and next chord highlighted">
+            <text x="450" y="280" fill="#a7b3a9" text-anchor="middle" font-size="16">Loading chord map…</text>
+          </svg>
+          <div class="map-legend">
+            <span><i class="legend-dot legend-current"></i>Playing now</span>
+            <span><i class="legend-dot legend-next"></i>Next chord</span>
+            <span><i class="legend-dot legend-linked"></i>Other chords</span>
+          </div>
+        </div>
+        <div id="graphList" class="graph-list"></div>
+        <p class="graph-note">Each chord can lead only to its listed connections. The next chord is selected randomly from the current chord's outgoing links; a self-transition is avoided when another option exists.</p>
+      </section>
+    </section>
+    <p class="footer-note">Visual timing is corrected against a monotonic clock. The optional metronome uses the Web Audio clock for steady clicks; keep this tab visible for the most reliable display timing.</p>
+  </main>
+
+  <script>
+    "use strict";
+
+    // Switchable directed chord graphs. "custom" preserves the user's supplied map.
+    const chordGraphs = {
+      custom: {
+        "C": ["Cm", "Am", "Em"],
+        "Cm": ["C", "Ab", "Eb"],
+        "Am": ["C", "A", "F"],
+        "Em": ["C", "G", "E"],
+        "G": ["Em", "Gm", "Bm"],
+        "Ab": ["Fm", "Abm", "Cm"],
+        "Eb": ["Ebm", "Gm", "Cm"],
+        "A": ["F#m", "C#m", "Am"],
+        "F": ["Fm", "Dm", "Am"],
+        "C#m": ["C#", "A", "E"],
+        "Gm": ["Bb", "Eb", "G"],
+        "Bm": ["D", "G", "B"],
+        "Abm": ["B", "E", "Ab"],
+        "Ebm": ["Gb", "B", "Eb"],
+        "Fm": ["Db", "Ab", "F"],
+        "Dm": ["D", "Bb", "F"],
+        "F#m": ["D", "A", "F#"],
+        "C#": ["C#m", "A#m", "Fm"],
+        "D": ["Bm", "F#m", "Dm"],
+        "Bb": ["Bbm", "Gm", "Dm"],
+        "G#m": ["B", "E", "G#m"],
+        "B": ["G#m", "D#m", "Bm"],
+        "Gb": ["Bbm", "Ebm", "Gbm"],
+        "Db": ["Fm", "Bbm", "Dbm"],
+        "Bbm": ["B", "G", "D"],
+        "Dbm": ["D", "Fb", "Bb"],
+        "A#m": ["A", "C#", "F#"],
+        "D#m": ["D#", "F#", "A#"],
+        "F#": ["F#m", "A#m", "D#m"],
+        "E": ["Em", "G#m", "C#m"]
+      },
+      common: {
+        // Familiar major/minor triad progressions in C major / A minor.
+        "C": ["Am", "F", "G", "Dm", "Em"],
+        "Dm": ["G", "Am", "F", "C"],
+        "Em": ["Am", "F", "C", "G"],
+        "F": ["C", "G", "Dm", "Am"],
+        "G": ["C", "Am", "Em", "Dm"],
+        "Am": ["F", "C", "G", "Dm", "Em"],
+        "Bm": ["Em", "G", "D"],
+        "D": ["G", "Bm", "A"],
+        "A": ["D", "F#m", "Bm", "E"],
+        "E": ["A", "C#m", "F#m", "B"],
+        "F#m": ["D", "A", "E", "Bm"],
+        "C#m": ["A", "E", "B", "F#m"],
+        "Gm": ["Eb", "Bb", "F", "Cm"],
+        "Bb": ["Eb", "F", "Gm", "Dm"],
+        "Eb": ["Bb", "Cm", "Ab", "Gm"],
+        "Ab": ["Eb", "Fm", "Db", "Cm"],
+        "Fm": ["Ab", "Db", "Eb", "Bbm"],
+        "Cm": ["Ab", "Eb", "Bb", "Fm"],
+        "Bbm": ["Db", "Eb", "Gb", "Fm"],
+        "Db": ["Ab", "Bbm", "Gb", "Fm"],
+        "Gb": ["Db", "Bbm", "Ebm", "Abm"],
+        "Ebm": ["Gb", "Bbm", "Db", "Abm"],
+        "Abm": ["Db", "Ebm", "Gb", "B"],
+        "B": ["E", "F#", "G#m", "D#m"],
+        "F#": ["B", "C#", "D#m", "G#m"],
+        "C#": ["F#", "G#m", "A#m", "D#m"],
+        "A#m": ["C#", "F#", "D#m"],
+        "D#m": ["B", "F#", "C#", "A#m"],
+        "G#m": ["E", "B", "F#", "C#m"],
+        "G": ["C", "D", "Em", "Am"]
+      }
+    };
+
+    function buildChordGraph(links) {
+      return Object.fromEntries(Object.entries(links).map(([name, next]) => {
+        const minor = name.endsWith("m");
+        return [name, {
+          name,
+          quality: `${name} ${minor ? "minor" : "major"} triad`,
+          notes: chordNotes[name] || [name, "—", "—"],
+          next: [...new Set(next)].filter(target => Object.prototype.hasOwnProperty.call(links, target))
+        }];
+      }));
+    }
+
+    const pitchNames = ["C", "C♯", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
+    const chordNotes = {
+      C:["C","E","G"], Cm:["C","E♭","G"], Am:["A","C","E"], Em:["E","G","B"], G:["G","B","D"],
+      Ab:["A♭","C","E♭"], Eb:["E♭","G","B♭"], A:["A","C♯","E"], F:["F","A","C"],
+      "C#m":["C♯","E","G♯"], Gm:["G","B♭","D"], Bm:["B","D","F♯"], Abm:["A♭","B","E♭"],
+      Ebm:["E♭","G♭","B♭"], Fm:["F","A♭","C"], Dm:["D","F","A"], "F#m":["F♯","A","C♯"],
+      "C#":["C♯","E♯","G♯"], D:["D","F♯","A"], Bb:["B♭","D","F"], "G#m":["G♯","B","D♯"],
+      B:["B","D♯","F♯"], Gb:["G♭","B♭","D♭"], Db:["D♭","F","A♭"], Bbm:["B♭","D♭","F"],
+      Dbm:["D♭","F♭","A♭"], "A#m":["A♯","C♯","E♯"], "D#m":["D♯","F♯","A♯"],
+      "F#":["F♯","A♯","C♯"], E:["E","G♯","B"], Dbm:["D♭","F♭","A♭"]
+    };
+
+    let activeGraphName = "custom";
+    let chordLinks = chordGraphs[activeGraphName];
+    let chordGraph = buildChordGraph(chordLinks);
+
+    const $ = (id) => document.getElementById(id);
+    const els = {
+      livePill: $("livePill"), runLabel: $("runLabel"),
+      currentChord: $("currentChord"), currentMeta: $("currentMeta"), currentNotes: $("currentNotes"),
+      currentPosition: $("currentPosition"), barTag: $("barTag"),
+      nextChord: $("nextChord"), nextMeta: $("nextMeta"), nextNotes: $("nextNotes"),
+      nextTiming: $("nextTiming"), countdownTag: $("countdownTag"),
+      progressFill: $("progressFill"), beatRow: $("beatRow"),
+      chordMap: $("chordMap"),
+      graphSelect: $("graphSelect"), startChord: $("startChord"), changeEvery: $("changeEvery"),
+      numerator: $("numerator"), denominator: $("denominator"),
+      tempoRange: $("tempoRange"), tempoNumber: $("tempoNumber"),
+      metronomeToggle: $("metronomeToggle"), metronomeLabel: $("metronomeLabel"),
+      startButton: $("startButton"), pauseButton: $("pauseButton"),
+      advanceButton: $("advanceButton"), resetButton: $("resetButton"),
+      statusLine: $("statusLine"), graphList: $("graphList"),
+      showGraphButton: $("showGraphButton")
+    };
+
+    let currentId = "C";
+    let nextId = null;
+    let running = false;
+    let rafId = null;
+    let timerId = null;
+    let sessionStart = 0;
+    let nextChangeAt = 0;
+    let pausedRemaining = 0;
+    let elapsedBeforePause = 0;
+    let lastRenderedBeat = -1;
+    let changeCount = 0;
+    let barCount = 1;
+    let beatCount = 1;
+    let graphVisible = true;
+    let audioContext = null;
+    let audioSchedulerId = null;
+    let nextAudioBeatAt = 0;
+    let audioBeatIndex = 0;
+    let metronomeEnabled = true;
+    const AUDIO_LOOKAHEAD_MS = 25;
+    const AUDIO_SCHEDULE_AHEAD_SECONDS = 0.12;
+
+    function config() {
+      return {
+        tempo: clamp(Number(els.tempoNumber.value) || 80, 30, 240),
+        numerator: Number(els.numerator.value),
+        denominator: Number(els.denominator.value),
+        interval: els.changeEvery.value === "bar"
+          ? Number(els.numerator.value)
+          : Number(els.changeEvery.value)
+      };
+    }
+    function clamp(n, min, max) { return Math.min(max, Math.max(min, n)); }
+    function beatMs() { return 60000 / config().tempo; }
+    function intervalMs() { return beatMs() * config().interval; }
+    function noteText(id) { return chordGraph[id].notes.join(" · "); }
+
+    function chooseNext(fromId) {
+      const links = (chordGraph[fromId]?.next || []).filter(id => chordGraph[id]);
+      if (!links.length) return fromId;
+      const alternatives = links.filter(id => id !== fromId);
+      const pool = alternatives.length ? alternatives : links;
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+
+    function ensureAudioContext() {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) {
+        els.statusLine.textContent = "Audio metronome is not supported in this browser.";
+        els.metronomeToggle.checked = false;
+        metronomeEnabled = false;
+        els.metronomeLabel.textContent = "Off";
+        return null;
+      }
+      if (!audioContext) audioContext = new AudioContextClass();
+      if (audioContext.state === "suspended") audioContext.resume();
+      return audioContext;
+    }
+
+    function scheduleClick(atTime, isDownbeat) {
+      if (!audioContext || audioContext.state !== "running") return;
+      const oscillator = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(isDownbeat ? 1320 : 880, atTime);
+      gain.gain.setValueAtTime(0.0001, atTime);
+      gain.gain.exponentialRampToValueAtTime(isDownbeat ? 0.42 : 0.23, atTime + 0.002);
+      gain.gain.exponentialRampToValueAtTime(0.0001, atTime + 0.045);
+      oscillator.connect(gain);
+      gain.connect(audioContext.destination);
+      oscillator.start(atTime);
+      oscillator.stop(atTime + 0.05);
+    }
+
+    function startAudioMetronome() {
+      stopAudioMetronome();
+      if (!metronomeEnabled || !running) return;
+      const ctx = ensureAudioContext();
+      if (!ctx) return;
+      // The first click is immediate, and subsequent clicks are scheduled ahead on the audio clock.
+      nextAudioBeatAt = ctx.currentTime + 0.035;
+      audioBeatIndex = 0;
+      audioSchedulerId = window.setInterval(() => {
+        if (!metronomeEnabled || !running || !audioContext || audioContext.state !== "running") return;
+        const beatSeconds = beatMs() / 1000;
+        const horizon = audioContext.currentTime + AUDIO_SCHEDULE_AHEAD_SECONDS;
+        while (nextAudioBeatAt < horizon) {
+          const isDownbeat = audioBeatIndex % config().numerator === 0;
+          scheduleClick(nextAudioBeatAt, isDownbeat);
+          nextAudioBeatAt += beatSeconds;
+          audioBeatIndex++;
+        }
+      }, AUDIO_LOOKAHEAD_MS);
+    }
+
+    function stopAudioMetronome() {
+      if (audioSchedulerId !== null) window.clearInterval(audioSchedulerId);
+      audioSchedulerId = null;
+    }
+
+    function updateMetronomeLabel() {
+      els.metronomeLabel.textContent = metronomeEnabled ? "On" : "Off";
+    }
+
+    function fillControls() {
+      for (let n = 2; n <= 12; n++) {
+        const opt = document.createElement("option");
+        opt.value = String(n); opt.textContent = String(n);
+        if (n === 4) opt.selected = true;
+        els.numerator.appendChild(opt);
+      }
+      populateStartChords("C");
+    }
+
+    function populateStartChords(preferred) {
+      els.startChord.replaceChildren();
+      Object.values(chordGraph).forEach(chord => {
+        const opt = document.createElement("option");
+        opt.value = chord.name; opt.textContent = chord.name;
+        els.startChord.appendChild(opt);
+      });
+      const start = chordGraph[preferred] ? preferred : (chordGraph.C ? "C" : Object.keys(chordGraph)[0]);
+      els.startChord.value = start;
+    }
+
+
+    function renderAnimatedChordMap() {
+      const svg = els.chordMap;
+      if (!svg) return;
+      const names = Object.keys(chordGraph);
+      if (!names.length) return;
+      const NS = "http://www.w3.org/2000/svg";
+      const W = 900, H = 560, cx = W / 2, cy = H / 2;
+      const positions = {};
+      const current = currentId;
+      const next = nextId && chordGraph[nextId] ? nextId : current;
+      // Current chord is always the focal point. The next chord is placed close by,
+      // while the rest of the graph is arranged in a stable circular orbit.
+      positions[current] = { x: cx, y: cy };
+      const ringNames = names.filter(n => n !== current && n !== next);
+      const angleOf = (name, index, total) => {
+        let hash = 0;
+        for (const ch of name) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
+        return (index / Math.max(total, 1)) * Math.PI * 2 - Math.PI / 2 + (hash % 17) * 0.008;
+      };
+      if (next !== current) {
+        const outgoing = chordGraph[current]?.next || [];
+        const linkedIndex = outgoing.indexOf(next);
+        const angle = linkedIndex >= 0 ? -Math.PI / 3 + linkedIndex * 0.5 : -Math.PI / 3;
+        positions[next] = { x: cx + Math.cos(angle) * 155, y: cy + Math.sin(angle) * 125 };
+      }
+      const outerRx = 365, outerRy = 220;
+      ringNames.forEach((name, i) => {
+        const a = angleOf(name, i, ringNames.length);
+        positions[name] = { x: cx + Math.cos(a) * outerRx, y: cy + Math.sin(a) * outerRy };
+      });
+
+      const make = (tag, attrs = {}) => {
+        const el = document.createElementNS(NS, tag);
+        for (const [key, value] of Object.entries(attrs)) el.setAttribute(key, String(value));
+        return el;
+      };
+      svg.replaceChildren();
+      const edgeLayer = make("g", { "aria-hidden": "true" });
+      const nodeLayer = make("g");
+      const seen = new Set();
+      names.forEach(from => {
+        const source = positions[from];
+        (chordGraph[from]?.next || []).forEach(to => {
+          if (!positions[to]) return;
+          const key = `${from}→${to}`;
+          if (seen.has(key)) return;
+          seen.add(key);
+          const target = positions[to];
+          const isCurrent = from === current && to === next;
+          const isNext = from === next && to === current;
+          edgeLayer.appendChild(make("line", {
+            x1: source.x, y1: source.y, x2: target.x, y2: target.y,
+            class: "map-edge" + (isCurrent ? " current-edge" : isNext ? " next-edge" : "")
+          }));
+        });
+      });
+
+      names.forEach(name => {
+        const p = positions[name];
+        const group = make("g", {
+          class: "map-node" + (name === current ? " current" : name === next && next !== current ? " next" : (chordGraph[current]?.next || []).includes(name) ? " neighbor" : ""),
+          transform: `translate(${p.x} ${p.y})`
+        });
+        const r = name === current ? 34 : name === next && next !== current ? 29 : 19;
+        group.appendChild(make("circle", { r }));
+        const label = make("text", { y: 1 });
+        label.textContent = name;
+        group.appendChild(label);
+        if (name === current) {
+          const caption = make("text", { y: 52, style: "font-size:11px;letter-spacing:1.4px;fill:#b9f36b;font-weight:700" });
+          caption.textContent = "PLAYING";
+          group.appendChild(caption);
+        } else if (name === next && next !== current) {
+          const caption = make("text", { y: 44, style: "font-size:10px;letter-spacing:1.2px;fill:#79edff;font-weight:700" });
+          caption.textContent = "UP NEXT";
+          group.appendChild(caption);
+        }
+        nodeLayer.appendChild(group);
+      });
+      svg.append(edgeLayer, nodeLayer);
+    }
+
+    function renderGraph() {
+      els.graphList.replaceChildren();
+      Object.values(chordGraph).forEach(chord => {
+        const row = document.createElement("div");
+        row.className = "graph-item" + (chord.name === currentId ? " active" : "");
+        const name = document.createElement("strong");
+        name.textContent = chord.name;
+        const links = document.createElement("span");
+        links.textContent = "→ " + (chord.next.length ? chord.next.join(", ") : "No outgoing links");
+        row.append(name, links);
+        els.graphList.appendChild(row);
+      });
+      els.graphList.hidden = !graphVisible;
+      els.showGraphButton.textContent = graphVisible ? "Hide graph" : "Show graph";
+      els.showGraphButton.setAttribute("aria-expanded", String(graphVisible));
+    }
+
+    function renderChords() {
+      const current = chordGraph[currentId];
+      const next = chordGraph[nextId] || current;
+      els.currentChord.textContent = current.name;
+      els.currentMeta.textContent = current.quality;
+      els.currentNotes.textContent = noteText(currentId);
+      els.nextChord.textContent = next.name;
+      els.nextMeta.textContent = next.quality;
+      els.nextNotes.textContent = noteText(nextId || currentId);
+      renderGraph();
+      renderAnimatedChordMap();
+    }
+
+    function renderBeatRow(activeBeat = 1) {
+      const count = config().numerator;
+      els.beatRow.replaceChildren();
+      for (let i = 1; i <= count; i++) {
+        const beat = document.createElement("div");
+        beat.className = "beat" + (i === 1 ? " downbeat" : "") + (i === activeBeat ? " active" : "");
+        beat.title = "Beat " + i;
+        els.beatRow.appendChild(beat);
+      }
+    }
+
+    function setRunningUI() {
+      //els.livePill.classList.toggle("running", running);
+      //els.runLabel.textContent = running ? "Playing" : (pausedRemaining > 0 ? "Paused" : "Ready to play");
+      els.startButton.textContent = running ? "▶ Restart" : "▶ Start";
+      els.pauseButton.disabled = !running;
+      els.pauseButton.textContent = "Ⅱ Pause";
+    }
+
+    function updatePosition(now) {
+      const elapsed = running ? (now - sessionStart) : elapsedBeforePause;
+      const beatLength = beatMs();
+      const absoluteBeat = Math.max(0, Math.floor(elapsed / beatLength));
+      beatCount = (absoluteBeat % config().numerator) + 1;
+      barCount = Math.floor(absoluteBeat / config().numerator) + 1;
+      els.currentPosition.textContent = `Beat ${beatCount} of ${config().numerator}`;
+      els.barTag.textContent = `Bar ${barCount}`;
+      renderBeatRow(beatCount);
+    }
+
+    function updateProgress(now) {
+      if (!running) {
+        els.progressFill.style.width = "0%";
+        els.countdownTag.textContent = pausedRemaining > 0 ? "Paused" : "Ready";
+        els.nextTiming.textContent = pausedRemaining > 0 ? "Resume to continue" : "Next change";
+        return;
+      }
+      const total = intervalMs();
+      const remaining = Math.max(0, nextChangeAt - now);
+      const progress = clamp(1 - remaining / total, 0, 1);
+      els.progressFill.style.width = `${progress * 100}%`;
+      els.countdownTag.textContent = `${(remaining / 1000).toFixed(1)}s`;
+      els.nextTiming.textContent = `In ${(remaining / 1000).toFixed(1)} seconds`;
+    }
+
+    // Schedule against absolute performance.now() timestamps, not chained intervals.
+    // A delayed callback catches up to the correct musical position without accumulating drift.
+    function tick() {
+      if (!running) return;
+      const now = performance.now();
+      const step = intervalMs();
+      let safety = 0;
+      while (now >= nextChangeAt && safety < 64) {
+        currentId = nextId || currentId;
+        nextId = chooseNext(currentId);
+        changeCount++;
+        nextChangeAt += step;
+        safety++;
+      }
+      if (safety > 0) {
+        renderChords();
+        els.statusLine.textContent = `Progression running · ${changeCount} chord change${changeCount === 1 ? "" : "s"} so far.`;
+      }
+      updatePosition(now);
+      updateProgress(now);
+      rafId = requestAnimationFrame(tick);
+    }
+
+    function start() {
+      stopLoops();
+      const now = performance.now();
+      if (pausedRemaining > 0) {
+        // Resume from the paused musical position and preserve the pending chord.
+        sessionStart = now - elapsedBeforePause;
+        nextChangeAt = now + pausedRemaining;
+        pausedRemaining = 0;
+        running = true;
+        setRunningUI();
+        startAudioMetronome();
+        els.statusLine.textContent = "Resumed. Your current chord and next transition are preserved.";
+        tick();
+        return;
+      }
+      const chosen = els.startChord.value;
+      currentId = chordGraph[chosen] ? chosen : Object.keys(chordGraph)[0];
+      nextId = chooseNext(currentId);
+      changeCount = 0;
+      elapsedBeforePause = 0;
+      pausedRemaining = 0;
+      sessionStart = now;
+      nextChangeAt = sessionStart + intervalMs();
+      running = true;
+      renderChords();
+      setRunningUI();
+      startAudioMetronome();
+      els.statusLine.textContent = "Progression running. The next chord is already visible.";
+      updatePosition(sessionStart);
+      tick();
+    }
+
+    function pause() {
+      if (!running) return;
+      const now = performance.now();
+      elapsedBeforePause = now - sessionStart;
+      pausedRemaining = Math.max(0, nextChangeAt - now);
+      running = false;
+      stopLoops();
+      setRunningUI();
+      updateProgress(now);
+      els.statusLine.textContent = "Paused. Press Start to resume from this chord and preserve the pending transition.";
+      // Preserve the current chord on screen while paused.
+    }
+
+    function stopLoops() {
+      if (rafId !== null) cancelAnimationFrame(rafId);
+      if (timerId !== null) clearTimeout(timerId);
+      rafId = null; timerId = null;
+      stopAudioMetronome();
+    }
+
+    function advance() {
+      if (running) {
+        currentId = nextId || currentId;
+        nextId = chooseNext(currentId);
+        changeCount++;
+        nextChangeAt = performance.now() + intervalMs();
+        sessionStart = performance.now() - elapsedBeforePause;
+        renderChords();
+        els.statusLine.textContent = "Advanced manually to the next chord.";
+      } else {
+        currentId = nextId || currentId;
+        nextId = chooseNext(currentId);
+        renderChords();
+        els.statusLine.textContent = "Advanced manually. Press Start to begin the timed progression.";
+      }
+      updateProgress(performance.now());
+    }
+
+    function reset() {
+      running = false;
+      stopLoops();
+      currentId = chordGraph[els.startChord.value] ? els.startChord.value : "C";
+      nextId = chooseNext(currentId);
+      changeCount = 0;
+      elapsedBeforePause = 0;
+      pausedRemaining = 0;
+      sessionStart = 0;
+      nextChangeAt = 0;
+      renderChords();
+      setRunningUI();
+      updatePosition(0);
+      updateProgress(0);
+      els.statusLine.textContent = "Reset to the selected starting chord.";
+    }
+
+    function settingsChanged() {
+      const wasRunning = running;
+      const oldCurrent = currentId;
+      if (wasRunning) {
+        // Restart timing cleanly with the same current chord under the new meter/tempo.
+        stopLoops();
+        sessionStart = performance.now();
+        nextChangeAt = sessionStart + intervalMs();
+        nextId = chooseNext(oldCurrent);
+        startAudioMetronome();
+      }
+      renderChords();
+      updatePosition(performance.now());
+      updateProgress(performance.now());
+      if (wasRunning) tick();
+    }
+
+    els.startButton.addEventListener("click", start);
+    els.pauseButton.addEventListener("click", pause);
+
+    // Spacebar toggles playback, except when the user is interacting with a control.
+    document.addEventListener("keydown", (event) => {
+      if (event.code !== "Space" || event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
+
+      const target = event.target;
+      const tag = target && target.tagName ? target.tagName.toLowerCase() : "";
+      const isTypingOrControl = target && (
+        target.isContentEditable ||
+        ["input", "textarea", "select", "button"].includes(tag) ||
+        (tag === "option")
+      );
+      if (isTypingOrControl) return;
+
+      event.preventDefault(); // Prevent the page from scrolling.
+      if (running) {
+        pause();
+      } else {
+        start();
+      }
+    });
+    els.advanceButton.addEventListener("click", advance);
+    els.resetButton.addEventListener("click", reset);
+
+    els.graphSelect.addEventListener("change", () => {
+      activeGraphName = els.graphSelect.value;
+      chordLinks = chordGraphs[activeGraphName];
+      chordGraph = buildChordGraph(chordLinks);
+      const preferred = chordGraph[currentId] ? currentId : "C";
+      populateStartChords(preferred);
+      reset();
+      els.statusLine.textContent = activeGraphName === "common"
+        ? "Common linked-chords graph selected."
+        : "Your chord graph selected.";
+    });
+    els.startChord.addEventListener("change", reset);
+    [els.changeEvery, els.numerator, els.denominator].forEach(el => el.addEventListener("change", settingsChanged));
+    els.tempoRange.addEventListener("input", () => {
+      els.tempoNumber.value = els.tempoRange.value;
+      settingsChanged();
+    });
+    els.tempoNumber.addEventListener("change", () => {
+      const tempo = clamp(Number(els.tempoNumber.value) || 80, 30, 240);
+      els.tempoNumber.value = String(tempo);
+      els.tempoRange.value = String(tempo);
+      settingsChanged();
+    });
+    els.metronomeToggle.addEventListener("change", () => {
+      metronomeEnabled = els.metronomeToggle.checked;
+      updateMetronomeLabel();
+      if (metronomeEnabled) {
+        // Creating/resuming audio must follow this user gesture in browsers that require it.
+        ensureAudioContext();
+        if (running) startAudioMetronome();
+        els.statusLine.textContent = running
+          ? "Audio metronome enabled."
+          : "Audio metronome enabled. It will click when you press Start.";
+      } else {
+        stopAudioMetronome();
+        els.statusLine.textContent = "Audio metronome disabled.";
+      }
+    });
+    els.showGraphButton.addEventListener("click", () => {
+      graphVisible = !graphVisible;
+      renderGraph();
+    });
+
+    // If the tab is backgrounded, reset the next visual deadline on return instead of
+    // attempting to flash through a long backlog of chords.
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden || !running) return;
+      const now = performance.now();
+      const step = intervalMs();
+      if (now >= nextChangeAt) {
+        const missed = Math.floor((now - nextChangeAt) / step) + 1;
+        for (let i = 0; i < Math.min(missed, 1000); i++) {
+          currentId = nextId || currentId;
+          nextId = chooseNext(currentId);
+          changeCount++;
+        }
+        nextChangeAt += missed * step;
+        renderChords();
+      }
+    });
+
+    fillControls();
+    nextId = chooseNext(currentId);
+    renderChords();
+    renderBeatRow(1);
+    setRunningUI();
+    updatePosition(0);
+  </script>
+
