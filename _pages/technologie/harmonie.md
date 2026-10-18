@@ -14,7 +14,7 @@ category: harmonie
         <div class="col-md-6" data-aos="fade-right" data-aos-delay="100">
             <div class="service-item">
               <div class="service-icon">
-                <i class="bi bi-mic-fill"></i>
+                <i class="bi bi-music-note-list"></i>
               </div>
               <div class="service-content">
                 <h3>{{ item.title}}</h3>

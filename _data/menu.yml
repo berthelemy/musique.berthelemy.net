@@ -22,5 +22,8 @@ menuitems:
       - page: Spectacle en direct
         url: /technologie/en-direct
         icon: music-note-beamed
+      - page: Harmonie
+        url: /technologie/harmonie
+        icon: music-note-list
   - title: Contact
     url: /contact
